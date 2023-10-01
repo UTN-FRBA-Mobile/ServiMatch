@@ -1,126 +1,164 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaTituloHome
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen( navController: NavController) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isButtonEnabled by remember { mutableStateOf(false) }
-    var paddingH = 16.dp
-    var paddingV = 8.dp
-    val painterIcon = painterResource(id = R.drawable.servimatch)
-    var isError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var errorIcon by remember { mutableStateOf(false) }
-
-    Column(
+fun HomeScreen( navController: NavController,username: String) {
+    var paddingH = 12.dp
+    var paddingV = 15.dp
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Turquesa1),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center)
-    {
-        Box(modifier = Modifier.padding(horizontal = 0.dp, vertical = 32.dp)) {
-            Image(painter = painterIcon, contentDescription = null)
-        }
-        OutlinedTextField(
-            value = username,
-            onValueChange = {
-                username = it
-                isButtonEnabled = it.isNotBlank() && password.isNotBlank()
-            },
-            label = { Text("Usuario") },
-            modifier = Modifier
-                .padding(horizontal = paddingH, vertical = paddingV)
-                .fillMaxWidth(),
-            singleLine = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
-                unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
-                focusedLabelColor = Turquesa3,
-                textColor = Turquesa5
-            )
-        )
-        OutlinedTextField(
-            value = password,
-            onValueChange = {
-                password = it
-                isButtonEnabled = it.isNotBlank() && username.isNotBlank()
-            },
-            isError = isError,
-            label = { Text("Contraseña") },
-            modifier = Modifier
-                .padding(horizontal = paddingH, vertical = paddingV)
-                .fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            supportingText={ Text(errorMessage) },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
-                unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
-                focusedLabelColor = Turquesa3,
-                textColor = Turquesa5,
-                errorSupportingTextColor = Color.Red
-            )
-        )
-        //Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                // Logica de Login
-                if (username == "usuario" && password == "contrasena") {
-                    isError=false
-                    errorMessage="Usuario Logueado"
-                    navController.navigate("home")
-                } else {
-                    isError=true
-                    errorMessage="Usuario y/o Contraseña incorrectos"
-                }
-            },
-            enabled = isButtonEnabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Turquesa3,
-                contentColor = Color.White,
-                disabledContainerColor = Turquesa2,
-                disabledContentColor = Turquesa3
-            ),
-            modifier = Modifier
-                .padding(horizontal = paddingH, vertical = paddingV)
-                .fillMaxWidth()
+            .background(Turquesa1)
+            .padding(horizontal = paddingH, vertical = paddingV)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(text = "Iniciar sesión")
+             Header(username, paddingH, paddingV)
+             Spacer(modifier = Modifier.height(25.dp)) // Espacio entre los filtros
+             Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Filters(modifier = Modifier.weight(0.7f)) // Primer conjunto de filtros
+                Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
+                Filters(modifier = Modifier.weight(0.7f)) // Segundo conjunto de filtros
+                Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
+                Filters(modifier = Modifier.weight(0.7f)) // Tercer conjunto de filtros
+
+            }
+
+
         }
-        Text(
-            text = "Olvidaste la contraseña?",
-            style = MaterialTheme.typography.bodySmall,
-            color = Turquesa5,
+    }
+}
+
+@Composable
+fun Filters(modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedZone by remember { mutableStateOf("Zona") }
+
+    val zones = listOf("Barrio 1", "Barrio 2", "Barrio 3")
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth(0.25f)
+            .clickable { expanded = true }, // Agregar un Modifier.clickable
+        shape = RoundedCornerShape(8.dp), // Bordes redondeados más suaves
+        border = BorderStroke(1.dp, Color.Black) // Delineado en negro
+    ) {
+        Box(
             modifier = Modifier
-                .padding(horizontal = paddingH, vertical = paddingV)
+                .background(
+                    Color.White,
+                    shape = RoundedCornerShape(8.dp) // Bordes redondeados más suaves
+                ),
+            content = {
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp) // Espaciado más pequeño
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(selectedZone, fontWeight = FontWeight.Bold)
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                    )
+                }
+            }
         )
     }
 
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        zones.forEach { zone ->
+            DropdownMenuItem(
+                onClick = {
+                    selectedZone = zone
+                    expanded = false
+                },
+                text = { Text(zone, color = Color.Black) }
+            )
+        }
+    }
 }
+
+
+@Composable
+fun Header(username: String, paddingH: Dp, paddingV: Dp) {
+    // Convertir el primer carácter a mayúscula y el resto a minúscula
+    val formattedUsername = username.lowercase().replaceFirstChar { it.uppercase() }
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f) // Este Box ocupa la mitad del espacio del Row
+                        .padding(end = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Bienvenido de nuevo, $formattedUsername",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = TurquesaTituloHome,
+                    )
+
+                }
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
+                ){
+                    Image(
+                        painter = painterResource(id = R.drawable.img),
+                        contentDescription = null, // Proporciona una descripción adecuada
+                        modifier = Modifier.size(75.dp) // Tamaño de la imagen
+                    )
+                }
+
+
+            }
+
+
+
+
+}
+
 

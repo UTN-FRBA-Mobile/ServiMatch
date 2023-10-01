@@ -10,11 +10,14 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
+val TurquesaTituloHome = Color(0xFF318872)
 val Turquesa1 = Color(0xFFD1F3EB)
 val Turquesa2 = Color(0xFFA3E7D6)
 val Turquesa3 = Color(0xFF48CFAD)
 val Turquesa4 = Color(0xFF246857)
 val Turquesa5 = Color(0xFF12342B)
+
+
 
 val Purpura1 = Color(0xFFB3A8D2)
 val Purpura2 = Color(0xFF6750A4)

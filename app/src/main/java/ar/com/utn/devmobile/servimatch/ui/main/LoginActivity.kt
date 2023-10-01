@@ -26,7 +26,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen( navController: NavController? = null) {
+fun LoginScreen( navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isButtonEnabled by remember { mutableStateOf(false) }
@@ -91,12 +91,16 @@ fun LoginScreen( navController: NavController? = null) {
         Button(
             onClick = {
                 // Logica de Login
-                if (username == "usuario" && password == "contrasena") {
-                    isError=false
-                    errorMessage="Usuario Logueado"
+                if (username == "admin" && password == "admin") {
+                    isError = false
+
+                    // Navegar a la pantalla de inicio y pasar el usuario como argumento
+                    navController.navigate(
+                        route = "home/${username}"
+                    )
                 } else {
-                    isError=true
-                    errorMessage="Usuario y/o Contraseña incorrectos"
+                    isError = true
+                    errorMessage = "Usuario y/o Contraseña incorrectos"
                 }
             },
             enabled = isButtonEnabled,
