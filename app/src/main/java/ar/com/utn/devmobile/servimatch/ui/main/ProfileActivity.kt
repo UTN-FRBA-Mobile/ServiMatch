@@ -43,8 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 
 
 @Composable
-fun ProfileScreen( navController: NavController, idPersona: String) {
-    val persona = personaCuidadoraMascotas //no uso la ID por ahora
+fun ProfileScreen( navController: NavController) {
+    val persona = personaCuidadoraMascotas //por ahora esta hardcodeado
     val promedioPuntajes = (comentariosCuidadoraMascotas.map { it.puntaje }.average() * 10).toInt() / 10.0
     val cantComentarios = persona.comentarios.size
 
@@ -65,17 +65,18 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(modifier = Modifier
-            .size(140.dp)
-            .background(color = Turquesa3, CircleShape)
+            .padding(top = 5.dp)
+            .size(250.dp)
             .clip(CircleShape)
-            .border(2.dp, color=Turquesa3)
+            .background(color = Turquesa3, CircleShape)
+            .border(5.dp, Turquesa3, CircleShape)
             .align(CenterHorizontally)
         ) {
             AsyncImage(
                 model = foto,
                 contentDescription = "Foto de perfil del ofertante",
                 modifier = Modifier
-                    .size(140.dp),
+                    .size(250.dp),
                 contentScale = ContentScale.Crop
             )
         }
@@ -168,6 +169,7 @@ fun Reseñas(comentarios: List<Comentario>) {
     ) {
         Text(
             text = "Reseñas",
+            fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold
         )
         Divider()
@@ -196,9 +198,9 @@ fun ReseñaItem(url: String, nombre: String, comentario: String, fecha: String, 
     ){
         Box(modifier = Modifier
             .size(40.dp)
-            .background(color = Turquesa3, CircleShape)
             .clip(CircleShape)
-            .border(2.dp, color=Turquesa3)
+            .background(color = Turquesa3, CircleShape)
+            .border(1.dp, Turquesa3, CircleShape)
         ) {
             AsyncImage(
                 model = url,
@@ -217,12 +219,12 @@ fun ReseñaItem(url: String, nombre: String, comentario: String, fecha: String, 
             Text(
                 text = nombre,
                 color = Color.LightGray,
-                fontSize = 15.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = comentario,
-                fontSize = 20.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -290,13 +292,13 @@ data class Comentario(
 )
 
 val comentariosCuidadoraMascotas = listOf(
-    Comentario("https://picsum.photos/id/250/100/100", "Firulais", "guau guau!!", "03/10/2023", 4.0),
-    Comentario("https://picsum.photos/id/251/100/100", "Roberto", "ok, todo bien", "04/10/2023", 4.5),
-    Comentario("https://picsum.photos/id/252/100/100", "Fluffy", "Me cobro caro, esperaba algo mas economico debido a que solamente lo cuido por unos minutos", "05/10/2023", 3.0),
-    Comentario("https://picsum.photos/id/253/100/100", "Luna", "Perfecto", "06/10/2023", 4.0),
-    Comentario("https://picsum.photos/id/254/100/100", "Maximiliano", "Excelente servicio", "07/10/2023", 5.0),
-    Comentario("https://picsum.photos/id/255/100/100", "Oliver", "Volvio peinado, perfecto", "08/10/2023", 3.5),
-    Comentario("https://picsum.photos/id/256/100/100", "Roxana", "El perro vino lleno de tierra, un desastre, nunca mas!", "09/10/2023", 2.0)
+    Comentario("https://picsum.photos/id/237/300/300", "Firulais", "guau guau!!", "03/10/2023", 4.0),
+    Comentario("https://picsum.photos/id/251/300/300", "Roberto", "ok, todo bien", "04/10/2023", 4.5),
+    Comentario("https://picsum.photos/id/252/300/300", "Fluffy", "Me cobro caro, esperaba algo mas economico debido a que solamente lo cuido por unos minutos", "05/10/2023", 3.0),
+    Comentario("https://picsum.photos/id/253/300/300", "Luna", "Perfecto", "06/10/2023", 4.0),
+    Comentario("https://picsum.photos/id/254/300/300", "Maximiliano", "Excelente servicio", "07/10/2023", 5.0),
+    Comentario("https://picsum.photos/id/255/300/300", "Oliver", "Volvio peinado, perfecto", "08/10/2023", 3.5),
+    Comentario("https://picsum.photos/id/256/300/300", "Roxana", "El perro vino lleno de tierra, un desastre, nunca mas!", "09/10/2023", 2.0)
 )
 
 val personaCuidadoraMascotas = Persona(
@@ -310,9 +312,9 @@ val personaCuidadoraMascotas = Persona(
 )
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowProfilePreview() {
     val navController = rememberNavController()
-    ProfileScreen(navController = navController, idPersona = "5")
+    ProfileScreen(navController = navController)
 }

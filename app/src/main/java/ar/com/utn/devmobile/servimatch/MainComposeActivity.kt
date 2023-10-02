@@ -25,7 +25,7 @@ class MainComposeActivity : ComponentActivity() {
 @Composable
 private fun App() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "profile") {
+    NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController = navController)
         }
         composable(
@@ -36,9 +36,10 @@ private fun App() {
             HomeScreen(navController = navController,username = username)
         }
         composable(
-            route = "profile"
+            route = "profile/{idProveedor}"
         ) {
-            ProfileScreen(navController = navController, idPersona = "5")
+            /*aca se haria un fetch con el id y se pasaria la persona mapeada de json a objeto, ni idea*/
+            ProfileScreen(navController = navController)
         }
     }
 }
