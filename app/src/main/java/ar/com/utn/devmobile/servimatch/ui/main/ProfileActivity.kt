@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Star
@@ -32,26 +33,31 @@ import coil.compose.AsyncImage
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.ui.text.style.TextOverflow
 
 
 @Composable
-fun ProfileScreen( navController: NavController, ) {
+fun ProfileScreen( navController: NavController, idPersona: String) {
+    val persona = personaCuidadoraMascotas //no uso la ID por ahora
+    val promedioPuntajes = (comentariosCuidadoraMascotas.map { it.puntaje }.average() * 10).toInt() / 10.0
+    val cantComentarios = persona.comentarios.size
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ){
-        PersonalInfo()
-        Puntajes()
+        PersonalInfo(persona.foto, persona.nombre, persona.profesion, persona.ubicaciones)
+        Puntajes(persona.servicios_completados, promedioPuntajes, cantComentarios)
         BotonesAcciones()
-        Reseñas()
+        Reseñas(persona.comentarios)
     }
 }
 
 @Composable
-fun PersonalInfo() {
+fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>) {
     Column () {
         AsyncImage(
-            model = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
+            model = foto,
             contentDescription = "Foto de perfil del ofertante",
             modifier = Modifier
                 .align(CenterHorizontally)
@@ -59,14 +65,14 @@ fun PersonalInfo() {
             contentScale = ContentScale.Crop
         )
         Text(
-            text = "Melisa Perez",
+            text = nombre,
             color = Turquesa3,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(CenterHorizontally)
         )
         Text(
-            text = "Niñera",
+            text = profesion,
             fontSize = 20.sp,
             modifier = Modifier
                 .align(CenterHorizontally)
@@ -74,23 +80,23 @@ fun PersonalInfo() {
         Row(verticalAlignment = CenterVertically){
             Icon(imageVector = Icons.Default.Place, contentDescription = "")
             Text(
-                text = "Flores, Caballito"
+                text = ubicaciones.joinToString(", ")
             )
         }
     }
 }
 
 @Composable
-fun Puntajes() {
+fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 30.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ){
-        PuntajeItem(122, "Servicios completados")
-        PuntajeItem(7.4, "Puntaje")
-        PuntajeItem(500, "Comentarios")
+        PuntajeItem(servicios_completados, "Servicios completados")
+        PuntajeItem(puntaje, "Puntaje")
+        PuntajeItem(comentarios, "Comentarios")
     }
 }
 
@@ -138,7 +144,7 @@ fun Boton(texto: String) {
 }
 
 @Composable
-fun Reseñas() {
+fun Reseñas(comentarios: List<Comentario>) {
     Column (
         modifier = Modifier
             .padding(30.dp)
@@ -151,16 +157,15 @@ fun Reseñas() {
         )
         Divider()
         LazyColumn() {
-            items(1) {
+            itemsIndexed(comentarios) { index, comentario ->
                 ReseñaItem(
-                    url = "https://picsum.photos/id/237/100/100",
-                    nombre = "Firulais",
-                    comentario = "guau guau!",
-                    fecha = "02/10/2023",
-                    estrellas = 4.0
+                    url = comentario.foto,
+                    nombre = comentario.nombre,
+                    comentario = comentario.comentario,
+                    fecha = comentario.fecha,
+                    estrellas = comentario.puntaje
                 )
             }
-
         }
     }
 }
@@ -189,7 +194,9 @@ fun ReseñaItem(url: String, nombre: String, comentario: String, fecha: String, 
             Text(
                 text = comentario,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = fecha
@@ -240,7 +247,7 @@ data class Persona(
     val foto: String,
     val nombre: String,
     val profesion: String,
-    val ubicacion: List<String>,
+    val ubicaciones: List<String>,
     val servicios_completados: Int,
     val comentarios: List<Comentario>
 )
@@ -255,8 +262,8 @@ data class Comentario(
 
 val comentariosCuidadoraMascotas = listOf(
     Comentario("https://picsum.photos/id/250/100/100", "Firulais", "guau guau!!", "03/10/2023", 4.0),
-    Comentario("https://picsum.photos/id/251/100/100", "Roberto", "ok", "04/10/2023", 4.5),
-    Comentario("https://picsum.photos/id/252/100/100", "Fluffy", "Me cobro caro", "05/10/2023", 3.0),
+    Comentario("https://picsum.photos/id/251/100/100", "Roberto", "ok, todo bien", "04/10/2023", 4.5),
+    Comentario("https://picsum.photos/id/252/100/100", "Fluffy", "Me cobro caro, esperaba algo mas economico debido a que solamente lo cuido por unos minutos", "05/10/2023", 3.0),
     Comentario("https://picsum.photos/id/253/100/100", "Luna", "Perfecto", "06/10/2023", 4.0),
     Comentario("https://picsum.photos/id/254/100/100", "Maximiliano", "Excelente servicio", "07/10/2023", 5.0),
     Comentario("https://picsum.photos/id/255/100/100", "Oliver", "Volvio peinado, perfecto", "08/10/2023", 3.5),
@@ -268,7 +275,7 @@ val personaCuidadoraMascotas = Persona(
     foto = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
     nombre="Melisa Perez",
     profesion="Cuidadora de Mascotas",
-    ubicacion=listOf("Flores", "Caballito"),
+    ubicaciones=listOf("Flores", "Caballito"),
     servicios_completados = 30,
     comentarios= comentariosCuidadoraMascotas
 )
@@ -278,5 +285,5 @@ val personaCuidadoraMascotas = Persona(
 @Composable
 fun ShowProfilePreview() {
     val navController = rememberNavController()
-    ProfileScreen(navController = navController)
+    ProfileScreen(navController = navController, idPersona = "5")
 }
