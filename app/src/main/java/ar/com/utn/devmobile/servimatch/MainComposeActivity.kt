@@ -38,7 +38,7 @@ private fun App() {
         composable(
             route = "profile"
         ) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController = navController, idPersona = "5")
         }
     }
 }

@@ -1,6 +1,9 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Star
@@ -33,6 +37,7 @@ import coil.compose.AsyncImage
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 
 
@@ -55,15 +60,24 @@ fun ProfileScreen( navController: NavController, idPersona: String) {
 
 @Composable
 fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>) {
-    Column () {
-        AsyncImage(
-            model = foto,
-            contentDescription = "Foto de perfil del ofertante",
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .size(140.dp),
-            contentScale = ContentScale.Crop
-        )
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(modifier = Modifier
+            .size(140.dp)
+            .background(color = Turquesa3, CircleShape)
+            .clip(CircleShape)
+            .border(2.dp, color=Turquesa3)
+            .align(CenterHorizontally)
+        ) {
+            AsyncImage(
+                model = foto,
+                contentDescription = "Foto de perfil del ofertante",
+                modifier = Modifier
+                    .size(140.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
         Text(
             text = nombre,
             color = Turquesa3,
@@ -173,16 +187,30 @@ fun Reseñas(comentarios: List<Comentario>) {
 @Composable
 fun ReseñaItem(url: String, nombre: String, comentario: String, fecha: String, estrellas: Double) {
     Row (
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
     ){
-        AsyncImage(
-            model = url,
-            contentDescription = "Comentario de $nombre",
-        )
+        Box(modifier = Modifier
+            .size(40.dp)
+            .background(color = Turquesa3, CircleShape)
+            .clip(CircleShape)
+            .border(2.dp, color=Turquesa3)
+        ) {
+            AsyncImage(
+                model = url,
+                contentDescription = "Comentario de $nombre",
+                modifier = Modifier
+                    .size(40.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 10.dp),
             horizontalAlignment = Alignment.Start
         ){
             Text(
