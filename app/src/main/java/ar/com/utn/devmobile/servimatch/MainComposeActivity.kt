@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.com.utn.devmobile.servimatch.ui.main.HomeScreen
 import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
+import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
 
 class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +25,7 @@ class MainComposeActivity : ComponentActivity() {
 @Composable
 private fun App() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "profile") {
         composable("login") { LoginScreen(navController = navController)
         }
         composable(
@@ -33,6 +34,11 @@ private fun App() {
         ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
             HomeScreen(navController = navController,username = username)
+        }
+        composable(
+            route = "profile"
+        ) {
+            ProfileScreen(navController = navController)
         }
     }
 }
