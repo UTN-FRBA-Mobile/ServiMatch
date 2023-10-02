@@ -1,10 +1,16 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -19,16 +25,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaTituloHome
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,19 +65,23 @@ fun HomeScreen( navController: NavController,username: String) {
             verticalArrangement = Arrangement.Top
         ) {
              Header(username, paddingH, paddingV)
-             Spacer(modifier = Modifier.height(25.dp)) // Espacio entre los filtros
+
+             Spacer(modifier = Modifier.height(25.dp)) // Espacio entre header y filtros
+
              Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                 Filters(modifier = Modifier.weight(0.7f),"zona",zones) // Primer conjunto de filtros
+                 Filter(modifier = Modifier.weight(0.7f),"zona",zones) // Primer conjunto de filtros
                  Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
-                 Filters(modifier = Modifier.weight(0.7f),"rubro",jobs) // Primer conjunto de filtros
+                 Filter(modifier = Modifier.weight(0.7f),"rubro",jobs) // Primer conjunto de filtros
                  Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
-                 Filters(modifier = Modifier.weight(0.7f),"precio",prices) // Primer conjunto de filtros
+                 Filter(modifier = Modifier.weight(0.7f),"precio",prices) // Primer conjunto de filtros
                  Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
             }
-            Spacer(modifier = Modifier.height(25.dp)) // Espacio entre los filtros
+
+            Spacer(modifier = Modifier.height(25.dp)) // Espacio entre filtros y recomendados
+
             ProvidersList()
 
         }
@@ -72,20 +90,92 @@ fun HomeScreen( navController: NavController,username: String) {
 
 @Composable
 fun ProvidersList() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(text = "Recomendados (3)",
-            style = MaterialTheme.typography.titleLarge,
-            color = PurpleGrey40,)
-    }
+    val context = LocalContext.current
 
+    val providerList = listOf(
+        ProviderInfo(R.drawable.hombre1, "Agustin", "$2500", "Palermo"),
+        ProviderInfo(R.drawable.hombre2, "Eduardo", "$1800", "Recoleta"),
+        ProviderInfo(R.drawable.mujer1, "Maria", "$3000", "Belgrano")
+        // Agrega más proveedores si es necesario
+    )
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        content = {
+            item {
+                Text(
+                    text = "Recomendados (${providerList.size})",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = PurpleGrey40,
+                )
+            }
+            items(providerList) { providerInfo ->
+                val imageBitmap: ImageBitmap =
+                    ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
+                Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location)
+            }
+            item {
+                Spacer(modifier = Modifier.height(25.dp))
+                Text(
+                    text = "MAS (${providerList.size})",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = PurpleGrey40,
+                )
+            }
+            items(providerList) { providerInfo ->
+                val imageBitmap: ImageBitmap =
+                    ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
+                Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location)
+            }
+        }
+    )
 }
 
+
+
 @Composable
-fun Filters(modifier: Modifier = Modifier, categoria:String,items:List<String>) {
+fun Provider(imageBitmap: ImageBitmap, nombre: String, precio: String, ubicacion: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Imagen
+        Image(
+            bitmap = imageBitmap,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(4.dp))
+        )
+
+        // Espacio entre la imagen y la información
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Columna con información de la persona
+        Column {
+            Text(
+                text = nombre,
+                style = TextStyle(fontWeight = FontWeight.Bold),
+                fontSize = 16.sp
+            )
+            Text(
+                text = "Desde $precio",
+                color = Color.Gray
+            )
+            Text(
+                text = "Ubicación: $ubicacion",
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+
+@Composable
+fun Filter(modifier: Modifier = Modifier, categoria:String,items:List<String>) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
 
@@ -135,7 +225,6 @@ fun Filters(modifier: Modifier = Modifier, categoria:String,items:List<String>) 
         }
     }
 }
-
 
 @Composable
 fun Header(username: String, paddingH: Dp, paddingV: Dp) {

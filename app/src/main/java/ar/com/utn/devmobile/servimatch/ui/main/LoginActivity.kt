@@ -91,7 +91,7 @@ fun LoginScreen( navController: NavController) {
         Button(
             onClick = {
                 // Logica de Login
-                if (username == "admin" && password == "admin") {
+                if (username == "Pablo25" && password == "pablo") {
                     isError = false
 
                     // Navegar a la pantalla de inicio y pasar el usuario como argumento
