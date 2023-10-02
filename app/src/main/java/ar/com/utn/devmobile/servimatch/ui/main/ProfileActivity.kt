@@ -66,7 +66,7 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
     ) {
         Box(modifier = Modifier
             .padding(top = 5.dp)
-            .size(250.dp)
+            .size(150.dp)
             .clip(CircleShape)
             .background(color = Turquesa3, CircleShape)
             .border(5.dp, Turquesa3, CircleShape)
@@ -76,7 +76,7 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
                 model = foto,
                 contentDescription = "Foto de perfil del ofertante",
                 modifier = Modifier
-                    .size(250.dp),
+                    .size(150.dp),
                 contentScale = ContentScale.Crop
             )
         }
@@ -107,7 +107,7 @@ fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 30.dp),
+            .padding(vertical = 20.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ){
         PuntajeItem(servicios_completados, "Servicios completados")
