@@ -17,7 +17,7 @@ val Turquesa3 = Color(0xFF48CFAD)
 val Turquesa4 = Color(0xFF246857)
 val Turquesa5 = Color(0xFF12342B)
 
-
+val Naranja = Color(0xFFFF8C00)
 
 val Purpura1 = Color(0xFFB3A8D2)
 val Purpura2 = Color(0xFF6750A4)
