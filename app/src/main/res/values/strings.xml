@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="welcome">Bienvenido de nuevo,</string>
+    <string name="recomendados">Recomendados</string>
+    <string name="mas_resultados">MAS</string>
+    <string name="resultados">Resultados</string>
+
 </resources>

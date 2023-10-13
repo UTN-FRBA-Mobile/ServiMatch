@@ -4,5 +4,6 @@ data class ProviderInfo(
     val imageResource: Int,
     val name: String,
     val price: String,
-    val location: String
+    val location: String,
+    val rol: String,
 )

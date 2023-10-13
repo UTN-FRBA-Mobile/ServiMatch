@@ -35,20 +35,15 @@ import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaTituloHome
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ar.com.utn.devmobile.servimatch.ui.theme.Pink40
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
+import androidx.compose.ui.res.stringResource
 import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaOjitoVer
 import ar.com.utn.devmobile.servimatch.ui.theme.VerdePrecio
 
@@ -58,64 +53,91 @@ import ar.com.utn.devmobile.servimatch.ui.theme.VerdePrecio
 fun HomeScreen(navController: NavController, username: String) {
     var paddingH = 10.dp
     var paddingV = 5.dp
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = paddingH, vertical = paddingV),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                Spacer(modifier = Modifier.height(5.dp))
-                Header(navController,username, 0.dp, 0.dp)
-                Spacer(modifier = Modifier.height(25.dp)) // Espacio entre header y filtros
-                FilterList()
-                Spacer(modifier = Modifier.height(25.dp)) // Espacio entre filtros y recomendados
-                ProvidersList(navController)
-            }
+
+    var searchList by remember { mutableStateOf<MutableList<ProviderInfo>>(mutableListOf()) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = paddingH, vertical = paddingV),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Spacer(modifier = Modifier.height(5.dp))
+        Header(navController, username, 0.dp, 0.dp)
+        Spacer(modifier = Modifier.height(25.dp)) // Espacio entre header y filtros
+        FilterList(searchList)
+        Spacer(modifier = Modifier.height(25.dp)) // Espacio entre filtros y recomendados
+        ProvidersList(navController, searchList)
+    }
 }
 
 @Composable
-fun ProvidersList(navController: NavController) {
+fun ProvidersList(navController: NavController, searchList: MutableList<ProviderInfo>) {
     val context = LocalContext.current
 
-    val providerList = listOf(
-        ProviderInfo(R.drawable.hombre1, "Agustin", "$2500", "Palermo"),
-        ProviderInfo(R.drawable.hombre2, "Eduardo", "$1800", "Recoleta"),
-        ProviderInfo(R.drawable.mujer1, "Maria", "$3000", "Belgrano")
+    val recommendedList = listOf(
+        ProviderInfo(R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"),
+        ProviderInfo(R.drawable.hombre2, "Eduardo Alarcón", "$1800", "Recoleta - Cerrajero", "cerrajero"),
+        ProviderInfo(R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Niñera", "niñera")
+        // Agrega más proveedores si es necesario
+    )
+
+    val generalList = listOf(
+        ProviderInfo(R.drawable.hombre3, "Lucas Sainz", "$3000", "Flores - Reparación Aire Acondicionado", "reparacion aire acondicionado"),
+        ProviderInfo(R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ", "limpieza hogar"),
         // Agrega más proveedores si es necesario
     )
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().padding(5.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
         content = {
-            item {
-                Text(
-                    text = "Recomendados (${providerList.size})",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = PurpleGrey40,
-                )
-            }
-            items(providerList) { providerInfo ->
-                val imageBitmap: ImageBitmap =
-                    ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location,navController)
-            }
-            item {
-                Spacer(modifier = Modifier.height(25.dp))
-                Text(
-                    text = "MAS (${providerList.size})",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = PurpleGrey40,
-                )
-            }
-            items(providerList) { providerInfo ->
-                val imageBitmap: ImageBitmap =
-                    ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location,navController)
+            if (searchList.isNotEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(id = R.string.resultados) + " (${searchList.size})",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = PurpleGrey40,
+                    )
+                }
+                items(searchList) { providerInfo ->
+                    val imageBitmap: ImageBitmap =
+                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                }
+            } else {
+                item {
+                    Text(
+                        text = stringResource(id = R.string.recomendados) + " (${recommendedList.size})",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = PurpleGrey40,
+                    )
+                }
+                items(recommendedList) { providerInfo ->
+                    val imageBitmap: ImageBitmap =
+                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(25.dp))
+                    Text(
+                        text = stringResource(id = R.string.mas_resultados) + " (${generalList.size})",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = PurpleGrey40,
+                    )
+                }
+                items(generalList) { providerInfo ->
+                    val imageBitmap: ImageBitmap =
+                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                }
             }
         }
     )
 }
+
 @Composable
 fun Provider(imageBitmap: ImageBitmap,
              nombre: String,
@@ -186,7 +208,7 @@ fun Provider(imageBitmap: ImageBitmap,
 }
 
 @Composable
-fun FilterList(){
+fun FilterList(searchList: MutableList<ProviderInfo>){
     val zones = listOf("Almagro", "Chacarita", "Flores")
     val jobs = listOf("Plomero", "Cerrajero", "Electricista")
     val prices = listOf("De Mayor a Menor", "De Menor a Mayor")
@@ -198,26 +220,33 @@ fun FilterList(){
         Filter(
             modifier = Modifier.weight(0.7f),
             "zona",
-            zones
+            zones,
+            searchList
         ) // Primer conjunto de filtros
         Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
             "rubro",
-            jobs
+            jobs,
+            searchList
         ) // Primer conjunto de filtros
         Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
             "precio",
-            prices
+            prices,
+            searchList
         ) // Primer conjunto de filtros
         Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
     }
 }
 
 @Composable
-fun Filter(modifier: Modifier = Modifier, categoria:String,items:List<String>) {
+fun Filter(modifier: Modifier = Modifier,
+           categoria:String,
+           items:List<String>,
+           searchList: MutableList<ProviderInfo>) {
+
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
 
@@ -261,6 +290,7 @@ fun Filter(modifier: Modifier = Modifier, categoria:String,items:List<String>) {
                 onClick = {
                     selectedItem = item
                     expanded = false
+                    searchList.add(  ProviderInfo(R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ","limpieza hogar"),)
                 },
                 text = { Text(item, color = Color.Black) }
             )
@@ -295,7 +325,7 @@ fun Header(navController: NavController, username: String, paddingH: Dp, padding
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = "Bienvenido de nuevo, $formattedUsername",
+                text = stringResource(id = R.string.welcome)+" "+formattedUsername,
                 style = MaterialTheme.typography.headlineSmall,
                 color = TurquesaTituloHome,
             )
