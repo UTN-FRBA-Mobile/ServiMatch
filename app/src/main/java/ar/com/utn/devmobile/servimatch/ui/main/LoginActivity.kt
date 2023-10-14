@@ -39,7 +39,8 @@ fun LoginScreen( navController: NavController) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Turquesa1),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center)
     {
@@ -52,6 +53,7 @@ fun LoginScreen( navController: NavController) {
                 username = it
                 isButtonEnabled = it.isNotBlank() && password.isNotBlank()
             },
+            isError = isError,
             label = { Text("Usuario") },
             modifier = Modifier
                 .padding(horizontal = paddingH, vertical = paddingV)

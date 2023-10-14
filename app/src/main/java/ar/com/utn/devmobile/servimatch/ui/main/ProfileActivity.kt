@@ -40,6 +40,7 @@ import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 
 
 @Composable
@@ -50,7 +51,7 @@ fun ProfileScreen( navController: NavController) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical=paddingV)
     ){
         PersonalInfo(persona.foto, persona.nombre, persona.profesion, persona.ubicaciones)
         Puntajes(persona.servicios_completados, promedioPuntajes, cantComentarios)
@@ -61,43 +62,45 @@ fun ProfileScreen( navController: NavController) {
 
 @Composable
 fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>) {
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(modifier = Modifier
-            .padding(top = 5.dp)
-            .size(150.dp)
-            .clip(CircleShape)
-            .background(color = Turquesa3, CircleShape)
-            .border(5.dp, Turquesa3, CircleShape)
-            .align(CenterHorizontally)
+    Column ()
+    {
+        Row(
+            modifier=Modifier.padding(top=4.dp)
         ) {
             AsyncImage(
                 model = foto,
                 contentDescription = "Foto de perfil del ofertante",
                 modifier = Modifier
-                    .size(150.dp),
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(color = Turquesa3, CircleShape)
+                    .border(5.dp, Turquesa3, CircleShape),
                 contentScale = ContentScale.Crop
             )
-        }
-        Text(
-            text = nombre,
-            color = Turquesa3,
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(CenterHorizontally)
-        )
-        Text(
-            text = profesion,
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(CenterHorizontally)
-        )
-        Row(verticalAlignment = CenterVertically){
-            Icon(imageVector = Icons.Default.Place, contentDescription = "")
+        Column(modifier = Modifier
+            .align(CenterVertically)
+            .padding(horizontal=4.dp))
+        {
             Text(
-                text = ubicaciones.joinToString(", ")
+                text = nombre,
+                color = Turquesa3,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal=4.dp)
             )
+            Text(
+                text = profesion,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(horizontal=4.dp)
+            )
+            Row(verticalAlignment = CenterVertically) {
+                Icon(imageVector = Icons.Default.Place, contentDescription = "")
+                Text(
+                    text = ubicaciones.joinToString(", ")
+                )
+            }
+        }
+
         }
     }
 }
@@ -107,7 +110,7 @@ fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 20.dp),
+            .padding(vertical = paddingV),
         horizontalArrangement = Arrangement.SpaceAround
     ){
         PuntajeItem(servicios_completados, "Servicios completados")
@@ -121,7 +124,7 @@ fun PuntajeItem(puntaje: Number, texto: String) {
     Column {
         Text(
             text = puntaje.toString(),
-            fontSize = 25.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Turquesa3,
             modifier = Modifier
@@ -163,7 +166,6 @@ fun Boton(texto: String) {
 fun Reseñas(comentarios: List<Comentario>) {
     Column (
         modifier = Modifier
-            .padding(30.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {

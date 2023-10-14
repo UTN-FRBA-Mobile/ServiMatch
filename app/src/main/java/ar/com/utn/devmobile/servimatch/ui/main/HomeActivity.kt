@@ -35,40 +35,51 @@ import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
-import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaTituloHome
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
-import ar.com.utn.devmobile.servimatch.ui.theme.TurquesaOjitoVer
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import ar.com.utn.devmobile.servimatch.ui.theme.VerdePrecio
 
-
+var paddingH = 16.dp
+var paddingV = 8.dp
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
-    var paddingH = 10.dp
-    var paddingV = 5.dp
-
     var searchList by remember { mutableStateOf<MutableList<ProviderInfo>>(mutableListOf()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = paddingH, vertical = paddingV),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Spacer(modifier = Modifier.height(5.dp))
-        Header(navController, username, 0.dp, 0.dp)
-        Spacer(modifier = Modifier.height(25.dp)) // Espacio entre header y filtros
-        FilterList(searchList)
-        Spacer(modifier = Modifier.height(25.dp)) // Espacio entre filtros y recomendados
-        ProvidersList(navController, searchList)
+            .background(Turquesa1)
+    )
+    {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = paddingH, vertical = paddingV),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Spacer(modifier = Modifier.height(0.dp))
+            Header(navController, username, 0.dp, 0.dp)
+            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre header y filtros
+            FilterList(searchList)
+            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre filtros y recomendados
+            ProvidersList(navController, searchList)
+        }
     }
 }
 
@@ -91,8 +102,8 @@ fun ProvidersList(navController: NavController, searchList: MutableList<Provider
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp),
+            .fillMaxWidth(),
+            //.padding(horizontal = 8.dp, vertical = 4.dp),
         content = {
             if (searchList.isNotEmpty()) {
                 item {
@@ -112,7 +123,7 @@ fun ProvidersList(navController: NavController, searchList: MutableList<Provider
                     Text(
                         text = stringResource(id = R.string.recomendados) + " (${recommendedList.size})",
                         style = MaterialTheme.typography.titleLarge,
-                        color = PurpleGrey40,
+                        color = Turquesa4,
                     )
                 }
                 items(recommendedList) { providerInfo ->
@@ -121,7 +132,7 @@ fun ProvidersList(navController: NavController, searchList: MutableList<Provider
                     Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
                 }
                 item {
-                    Spacer(modifier = Modifier.height(25.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(id = R.string.mas_resultados) + " (${generalList.size})",
                         style = MaterialTheme.typography.titleLarge,
@@ -147,7 +158,7 @@ fun Provider(imageBitmap: ImageBitmap,
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(vertical=paddingV),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Imagen
@@ -157,8 +168,8 @@ fun Provider(imageBitmap: ImageBitmap,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(5.dp, TurquesaOjitoVer)
+                .clip(CircleShape)
+                .border(2.dp, Turquesa3, CircleShape)
         )
 
         // Espacio entre la imagen y la información
@@ -171,15 +182,18 @@ fun Provider(imageBitmap: ImageBitmap,
             Text(
                 text = nombre,
                 style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 16.sp
+                fontSize = 20.sp,
+                color = Turquesa5
             )
             Text(
-                text = "Desde $precio",
-                color = VerdePrecio
+                //text = "Desde $precio",
+                text = "$$$",
+                fontSize = 16.sp,
+                color = Purpura3
             )
             Text(
                 text = "$ubicacion",
-                color = Color.Gray
+                color = Purpura2
             )
         }
 
@@ -198,7 +212,7 @@ fun Provider(imageBitmap: ImageBitmap,
             Icon(
                 painter = painterResource(id = R.drawable.eye), // Reemplaza con el recurso de tu icono de ojo
                 contentDescription = null,
-                tint =TurquesaTituloHome // Color del icono
+                tint = Turquesa4 // Color del icono
             )
         }
         // Divider negro como separador
@@ -214,30 +228,30 @@ fun FilterList(searchList: MutableList<ProviderInfo>){
     val prices = listOf("De Mayor a Menor", "De Menor a Mayor")
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Filter(
             modifier = Modifier.weight(0.7f),
-            "zona",
+            "Zona",
             zones,
             searchList
         ) // Primer conjunto de filtros
-        Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
+        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
-            "rubro",
+            "Rubro",
             jobs,
             searchList
         ) // Primer conjunto de filtros
-        Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
+        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
-            "precio",
+            "Precio",
             prices,
             searchList
-        ) // Primer conjunto de filtros
-        Spacer(modifier = Modifier.width(10.dp)) // Espacio entre los filtros
+        )
     }
 }
 
@@ -327,7 +341,7 @@ fun Header(navController: NavController, username: String, paddingH: Dp, padding
             Text(
                 text = stringResource(id = R.string.welcome)+" "+formattedUsername,
                 style = MaterialTheme.typography.headlineSmall,
-                color = TurquesaTituloHome,
+                color = Turquesa4,
             )
         }
 
