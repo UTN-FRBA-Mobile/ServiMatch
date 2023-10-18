@@ -1,0 +1,14 @@
+# cache
+__pycache__/
+*.pyc
+
+# otros
+venv/
+build/
+.env
+.flaskenv
+
+# aca se guardan, por ahora, los audios q se envian al endpoint
+uploads/
+temp/
+/.venv
