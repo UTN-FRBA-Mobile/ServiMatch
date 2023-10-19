@@ -1,6 +1,7 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
@@ -10,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -36,6 +36,7 @@ import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
@@ -43,24 +44,31 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
-import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
+
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
-import ar.com.utn.devmobile.servimatch.ui.theme.VerdePrecio
 
 var paddingH = 16.dp
 var paddingV = 8.dp
+
+
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
-    var searchList by remember { mutableStateOf<MutableList<ProviderInfo>>(mutableListOf()) }
+
+    //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
+    val listaDeProveedores = viewModel<ListaDeProveedores>()
+
+    //Cargo las primeras listas, recomendados y general. Pegandole al back.
+    listaDeProveedores.getRecomendados()
+    listaDeProveedores.getGeneral()
 
     Column(
         modifier = Modifier
@@ -74,46 +82,44 @@ fun HomeScreen(navController: NavController, username: String) {
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(0.dp))
+
+            //Renderizo header.
             Header(navController, username, 0.dp, 0.dp)
+
             Spacer(modifier = Modifier.height(16.dp)) // Espacio entre header y filtros
-            FilterList(searchList)
+
+            //Renderizo lista de filtros
+            FilterList(listaDeProveedores)
+
             Spacer(modifier = Modifier.height(16.dp)) // Espacio entre filtros y recomendados
-            ProvidersList(navController, searchList)
+
+            //Renderizo lista de Proveedores. Inicialmente renderiza las listas recomendados y general.
+            ProvidersList(navController, listaDeProveedores)
+
         }
     }
 }
 
 @Composable
-fun ProvidersList(navController: NavController, searchList: MutableList<ProviderInfo>) {
+fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveedores) {
     val context = LocalContext.current
-
-    val recommendedList = listOf(
-        ProviderInfo(R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"),
-        ProviderInfo(R.drawable.hombre2, "Eduardo Alarcón", "$1800", "Recoleta - Cerrajero", "cerrajero"),
-        ProviderInfo(R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Niñera", "niñera")
-        // Agrega más proveedores si es necesario
-    )
-
-    val generalList = listOf(
-        ProviderInfo(R.drawable.hombre3, "Lucas Sainz", "$3000", "Flores - Reparación Aire Acondicionado", "reparacion aire acondicionado"),
-        ProviderInfo(R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ", "limpieza hogar"),
-        // Agrega más proveedores si es necesario
-    )
+    val busqueda by remember { listaProveedores.busqueda }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth(),
             //.padding(horizontal = 8.dp, vertical = 4.dp),
         content = {
-            if (searchList.isNotEmpty()) {
+         if (busqueda.isNotEmpty()) {
+
                 item {
                     Text(
-                        text = stringResource(id = R.string.resultados) + " (${searchList.size})",
+                        text = stringResource(id = R.string.resultados) + " (${busqueda.size})",
                         style = MaterialTheme.typography.titleLarge,
                         color = PurpleGrey40,
                     )
                 }
-                items(searchList) { providerInfo ->
+                items(busqueda) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
                     Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
@@ -121,12 +127,12 @@ fun ProvidersList(navController: NavController, searchList: MutableList<Provider
             } else {
                 item {
                     Text(
-                        text = stringResource(id = R.string.recomendados) + " (${recommendedList.size})",
+                        text = stringResource(id = R.string.recomendados) + " (${listaProveedores.recomendados.value.size})",
                         style = MaterialTheme.typography.titleLarge,
                         color = Turquesa4,
                     )
                 }
-                items(recommendedList) { providerInfo ->
+                items(listaProveedores.recomendados.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
                     Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
@@ -134,12 +140,12 @@ fun ProvidersList(navController: NavController, searchList: MutableList<Provider
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(id = R.string.mas_resultados) + " (${generalList.size})",
+                        text = stringResource(id = R.string.mas_resultados) + " (${listaProveedores.general.value.size})",
                         style = MaterialTheme.typography.titleLarge,
                         color = PurpleGrey40,
                     )
                 }
-                items(generalList) { providerInfo ->
+                items(listaProveedores.general.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
                     Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
@@ -222,7 +228,7 @@ fun Provider(imageBitmap: ImageBitmap,
 }
 
 @Composable
-fun FilterList(searchList: MutableList<ProviderInfo>){
+fun FilterList(listaProveedores: ListaDeProveedores){
     val zones = listOf("Almagro", "Chacarita", "Flores")
     val jobs = listOf("Plomero", "Cerrajero", "Electricista")
     val prices = listOf("De Mayor a Menor", "De Menor a Mayor")
@@ -236,21 +242,21 @@ fun FilterList(searchList: MutableList<ProviderInfo>){
             modifier = Modifier.weight(0.7f),
             "Zona",
             zones,
-            searchList
+            listaProveedores
         ) // Primer conjunto de filtros
         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
             "Rubro",
             jobs,
-            searchList
+            listaProveedores
         ) // Primer conjunto de filtros
         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
             "Precio",
             prices,
-            searchList
+            listaProveedores
         )
     }
 }
@@ -259,7 +265,7 @@ fun FilterList(searchList: MutableList<ProviderInfo>){
 fun Filter(modifier: Modifier = Modifier,
            categoria:String,
            items:List<String>,
-           searchList: MutableList<ProviderInfo>) {
+           listaProveedores: ListaDeProveedores) {
 
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
@@ -302,10 +308,9 @@ fun Filter(modifier: Modifier = Modifier,
         items.forEach { item ->
             DropdownMenuItem(
                 onClick = {
+                    listaProveedores.buscarPorFiltro(categoria,item)
                     selectedItem = item
-                    expanded = false
-                    searchList.add(  ProviderInfo(R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ","limpieza hogar"),)
-                },
+                    expanded = false },
                 text = { Text(item, color = Color.Black) }
             )
         }
