@@ -25,17 +25,17 @@ class ListaDeProveedores : ViewModel() {
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
     fun getRecomendados(){
         recomendados.value = mutableListOf<ProviderInfo>().apply {
-            add(ProviderInfo(R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"))
-            add( ProviderInfo(R.drawable.hombre2, "Eduardo Alarcón", "$1800", "Recoleta - Cerrajero", "cerrajero"))
-            add(ProviderInfo(R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Plomero", "Plomero"))
+            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"))
+            add( ProviderInfo(1,R.drawable.hombre2, "Eduardo Alarcón", "$1800", "Recoleta - Cerrajero", "cerrajero"))
+            add(ProviderInfo(2,R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Plomero", "Plomero"))
         }
     }
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get general.
     fun getGeneral(){
         general.value = mutableListOf<ProviderInfo>().apply {
-            add(ProviderInfo(R.drawable.hombre3, "Lucas Sainz", "$3000", "Flores - Reparación Aire Acondicionado", "reparacion aire acondicionado"))
-            add(ProviderInfo(R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ", "limpieza hogar"))
+            add(ProviderInfo(3,R.drawable.hombre3, "Lucas Sainz", "$3000", "Flores - Reparación Aire Acondicionado", "reparacion aire acondicionado"))
+            add(ProviderInfo(4,R.drawable.mujer2, "Eugenia Romano", "$2500", "Caballito - Limpieza Hogar ", "limpieza hogar"))
 
         }
     }
@@ -61,9 +61,9 @@ class ListaDeProveedores : ViewModel() {
         //Le pego y me traigo los proveedores. Los cargo en la lista de busqueda, cuando deje de ser vacia se renderiza.
         busqueda.value = mutableListOf<ProviderInfo>().apply {
             addAll(busqueda.value)
-            add( ProviderInfo(R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Plomero", "plomero")
+            add( ProviderInfo(2,R.drawable.mujer1, "Maria Esperanza", "$3000", "Belgrano - Plomero", "plomero")
             )
-            add(ProviderInfo(R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"),
+            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin Benitez", "$2500", "Palermo - Plomero", "plomero"),
             )
 
         }

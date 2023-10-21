@@ -1,5 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +49,12 @@ fun ProfileScreen( navController: NavController) {
     val persona = personaCuidadoraMascotas //por ahora esta hardcodeado
     val promedioPuntajes = (comentariosCuidadoraMascotas.map { it.puntaje }.average() * 10).toInt() / 10.0
     val cantComentarios = persona.comentarios.size
+    val arguments = navController.currentBackStackEntry?.arguments
+    val idProveedor = arguments?.getString("idProveedor")
 
+
+
+    Log.d("ACAAAAA -------->", idProveedor.toString());
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical=paddingV)

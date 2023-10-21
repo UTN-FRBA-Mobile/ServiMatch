@@ -122,7 +122,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(busqueda) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -135,7 +135,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(listaProveedores.recomendados.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -148,7 +148,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(listaProveedores.general.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController)
+                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -160,7 +160,8 @@ fun Provider(imageBitmap: ImageBitmap,
              nombre: String,
              precio: String,
              ubicacion: String,
-             navController: NavController) {
+             navController: NavController,
+             identificador: Number) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +208,7 @@ fun Provider(imageBitmap: ImageBitmap,
         IconButton(
             onClick = {
                 // Acción a realizar cuando se hace clic en el icono
-                navController.navigate("profile/123") {
+                navController.navigate("profile/$identificador") {
                     // Puedes pasar el ID del proveedor como argumento si es necesario
                     // arguments = bundleOf("idProveedor" to proveedor.id)
                 }
