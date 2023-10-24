@@ -264,6 +264,9 @@ fun FilterList(listaProveedores: ListaDeProveedores){
 
 @Composable
 fun Filter(modifier: Modifier = Modifier,
+
+
+
            categoria:String,
            items:List<String>,
            listaProveedores: ListaDeProveedores) {
