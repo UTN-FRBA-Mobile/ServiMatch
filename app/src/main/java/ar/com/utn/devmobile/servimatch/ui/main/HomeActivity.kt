@@ -122,7 +122,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(busqueda) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -135,7 +135,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(listaProveedores.recomendados.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -148,7 +148,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                 items(listaProveedores.general.value) { providerInfo ->
                     val imageBitmap: ImageBitmap =
                         ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.price, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -158,7 +158,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
 @Composable
 fun Provider(imageBitmap: ImageBitmap,
              nombre: String,
-             precio: String,
+             simboloPrecio: String,
              ubicacion: String,
              navController: NavController,
              identificador: Number) {
@@ -194,7 +194,7 @@ fun Provider(imageBitmap: ImageBitmap,
             )
             Text(
                 //text = "Desde $precio",
-                text = "$$$",
+                text = simboloPrecio,
                 fontSize = 16.sp,
                 color = Purpura3
             )

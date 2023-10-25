@@ -100,9 +100,9 @@ fun LoginScreen( navController: NavController) {
                     isLoading = true
                     isError = false
                     errorMessage = ""
-
                     // Simula una carga de 3 segundos
                     viewModelScope.launch {
+                        //ACA TENGO QUE PEGARLE AL BACK.
                         delay(3000)
                         if (username == "Pablo25" && password == "pablo") {
                             // Navegar a la pantalla de inicio y pasar el usuario como argumento
