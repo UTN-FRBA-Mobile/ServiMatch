@@ -58,7 +58,7 @@ def login():
         username = data['username']
         password = data['password']
 
-        if username == "serviceMatchUser" and password == "serviceMatch1234":
+        if username == "admin" and password == "admin":
             return jsonify({'message': 'Login successful'}), 200
         else:
             return jsonify({'message': 'Login error'}), 403
