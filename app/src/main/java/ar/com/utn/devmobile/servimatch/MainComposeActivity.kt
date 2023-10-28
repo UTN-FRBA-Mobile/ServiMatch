@@ -1,9 +1,12 @@
 package ar.com.utn.devmobile.servimatch
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,6 +15,7 @@ import androidx.navigation.navArgument
 import ar.com.utn.devmobile.servimatch.ui.main.HomeScreen
 import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 
 class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +25,8 @@ class MainComposeActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 @Composable
 private fun App() {

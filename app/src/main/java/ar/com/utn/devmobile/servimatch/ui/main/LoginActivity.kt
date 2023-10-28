@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +24,8 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +39,8 @@ fun LoginScreen( navController: NavController) {
     var isError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var errorIcon by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) } // Nuevo estado para la animación de carga
+    val viewModelScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -91,17 +96,25 @@ fun LoginScreen( navController: NavController) {
         //Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                // Logica de Login
-                if (username == "Pablo25" && password == "pablo") {
+                if (!isLoading) { // Evita hacer otra solicitud mientras se está cargando
+                    isLoading = true
                     isError = false
-
-                    // Navegar a la pantalla de inicio y pasar el usuario como argumento
-                    navController.navigate(
-                        route = "home/${username}"
-                    )
-                } else {
-                    isError = true
-                    errorMessage = "Usuario y/o Contraseña incorrectos"
+                    errorMessage = ""
+                    // Simula una carga de 3 segundos
+                    viewModelScope.launch {
+                        //ACA TENGO QUE PEGARLE AL BACK.
+                        delay(3000)
+                        if (username == "Pablo25" && password == "pablo") {
+                            // Navegar a la pantalla de inicio y pasar el usuario como argumento
+                            navController.navigate(
+                                route = "home/${username}"
+                            )
+                        } else {
+                            isError = true
+                            errorMessage = "Usuario y/o Contraseña incorrectos"
+                        }
+                        isLoading = false
+                    }
                 }
             },
             enabled = isButtonEnabled,
@@ -115,7 +128,11 @@ fun LoginScreen( navController: NavController) {
                 .padding(horizontal = paddingH, vertical = paddingV)
                 .fillMaxWidth()
         ) {
-            Text(text = "Iniciar sesión")
+            if (isLoading) {
+                CircularProgressIndicator() // Muestra la animación de carga
+            } else {
+                Text(text = "Iniciar sesión")
+            }
         }
         Text(
             text = "Olvidaste la contraseña?",
