@@ -34,8 +34,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
+
 object RetrofitInstance {
-    private const val BASE_URL = "http://localhost:5000" // Reemplaza con la URL de tu backend
+    private const val BASE_URL = "http://10.10.0.14:5000/" // ACA HAY QUE PONER LA IP DE LA PC, Y NO LOCALHOST
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -44,7 +45,6 @@ object RetrofitInstance {
             .build()
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen( navController: NavController) {
@@ -58,7 +58,6 @@ fun LoginScreen( navController: NavController) {
     val painterIcon = painterResource(id = R.drawable.servimatch)
     var isError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    var errorIcon by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) } // Nuevo estado para la animación de carga
     val viewModelScope = rememberCoroutineScope()
 
@@ -129,15 +128,16 @@ fun LoginScreen( navController: NavController) {
 
                             if (response.isSuccessful) {
                                 // La solicitud fue exitosa, puedes procesar la respuesta aquí
-                                val result = response.body() // Esto es tu modelo de respuesta
-                                // Procesa el resultado como desees
+                                navController.navigate(
+                                    route = "home/${username}"
+                                )
                             } else {
                                 isError = true
                                 errorMessage = "Usuario y/o Contraseña incorrectos"
                             }
                         } catch (e: Exception) {
                             isError = true
-                            errorMessage = "Error en la solicitud"
+                            errorMessage = "Error del Servidor. Intente mas tarde"
                             Log.d("ERROR", e.toString());
 
                         }

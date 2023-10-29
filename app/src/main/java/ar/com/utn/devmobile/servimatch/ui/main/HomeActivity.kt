@@ -2,6 +2,7 @@ package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
@@ -36,6 +37,8 @@ import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyScopeMarker
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
@@ -47,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
@@ -54,15 +58,16 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import com.google.gson.GsonBuilder
+import org.json.JSONObject
+import retrofit2.Response
 
 var paddingH = 16.dp
 var paddingV = 8.dp
-
-
+val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
-
     //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
     val listaDeProveedores = viewModel<ListaDeProveedores>()
 
@@ -230,15 +235,21 @@ fun Provider(imageBitmap: ImageBitmap,
 
 @Composable
 fun FilterList(listaProveedores: ListaDeProveedores){
-    val zones = listOf("Almagro", "Chacarita", "Flores")
-    val jobs = listOf("Plomero", "Cerrajero", "Electricista")
-    val prices = listOf("De Mayor a Menor", "De Menor a Mayor")
+    var zones by remember { mutableStateOf(emptyList<String>()) }
+    var jobs by remember { mutableStateOf(emptyList<String>()) }
+    var rating by remember { mutableStateOf(emptyList<String>()) }
 
+    LaunchedEffect(Unit) {
+        zones = apiService.zonas()
+        jobs= apiService.profesiones()
+        rating= apiService.rating()
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
-    ) {
+    )
+    {
         Filter(
             modifier = Modifier.weight(0.7f),
             "Zona",
@@ -255,8 +266,8 @@ fun FilterList(listaProveedores: ListaDeProveedores){
         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
         Filter(
             modifier = Modifier.weight(0.7f),
-            "Precio",
-            prices,
+            "Valoracion",
+            rating,
             listaProveedores
         )
     }
@@ -307,7 +318,7 @@ fun Filter(modifier: Modifier = Modifier,
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.wrapContentSize().height(200.dp)
     ) {
         items.forEach { item ->
             DropdownMenuItem(
