@@ -1,5 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,7 +62,7 @@ fun ProfileScreen( navController: NavController) {
     ){
         PersonalInfo(persona.foto, persona.nombre, persona.profesion, persona.ubicaciones)
         Puntajes(persona.servicios_completados, promedioPuntajes, cantComentarios)
-        BotonesAcciones()
+        BotonesAcciones(navController, persona)
         Reseñas(persona.comentarios)
     }
 }
@@ -143,20 +144,20 @@ fun PuntajeItem(puntaje: Number, texto: String) {
 }
 
 @Composable
-fun BotonesAcciones() {
+fun BotonesAcciones(navController : NavController, persona: Persona) {
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Boton("Reservar")
-        Boton("Contactame")
+        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}")})
+        Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.nombre}")})
     }
 }
 
 @Composable
-fun Boton(texto: String) {
+fun Boton(texto: String, onClick: ()->Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Turquesa3,
             contentColor = Color.White,
