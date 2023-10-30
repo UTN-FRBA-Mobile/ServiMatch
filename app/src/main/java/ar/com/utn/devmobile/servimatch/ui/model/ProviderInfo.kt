@@ -7,7 +7,7 @@ data class ProviderInfo(
     val identificador: Int,
 
     @SerializedName("image_path")
-    val imageResource: Int,
+    val imageResource: String,
 
     @SerializedName("nombre")
     val name: String,

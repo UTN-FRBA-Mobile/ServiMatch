@@ -44,10 +44,8 @@ private fun App() {
             HomeScreen(navController = navController,username = username)
         }
         composable(
-            route = "profile/{idProveedor}",
-            arguments = listOf(navArgument("idProveedor") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("idProveedor") ?: 1
+            route = "profile/{idProveedor}"
+        ) {
             ProfileScreen(navController = navController, idProveedor = id)
         }
 

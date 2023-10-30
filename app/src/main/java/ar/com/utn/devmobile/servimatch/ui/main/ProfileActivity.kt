@@ -49,22 +49,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.Comentario
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderProfile
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
-
 
 @Composable
 fun ProfileScreen(navController: NavController, idProveedor: Int) {
     var providerProfile by remember { mutableStateOf<ProviderProfile?>(PERSONAMOCKEADA) }
-
+    val arguments = navController.currentBackStackEntry?.arguments
+    val idProveedor = arguments?.getString("idProveedor")
+    val id = idProveedor?.toInt()
     LaunchedEffect(Unit) {
-        val response = ApiClient.apiService.getProvider(5)
+        val response = id?.let { ApiClient.apiService.getProvider(it) }
 
-        providerProfile = if (response.isSuccessful) {
-            response.body()
-        } else {
-            Log.d("ERROR", "No se pudo obtener el proveedor con id $idProveedor")
-            PERSONAMOCKEADA
+        if (response != null) {
+            providerProfile = if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.d("ERROR", "No se pudo obtener el proveedor con id $idProveedor")
+                PERSONAMOCKEADA
+            }
         }
     }
 

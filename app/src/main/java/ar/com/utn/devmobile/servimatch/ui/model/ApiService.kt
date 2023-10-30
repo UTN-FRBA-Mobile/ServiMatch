@@ -20,6 +20,6 @@ interface ApiService {
 
     @GET("/providers/{id}")
     suspend fun getProvider(@Path("id") id: Int): Response<ProviderProfile>
-    @GET("/recomendados")
-    suspend fun recomendados(): List<String>
+    @GET("/providers/")
+    suspend fun getProviders(): Response<List<ProviderInfo>>
 }

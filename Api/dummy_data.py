@@ -1,4 +1,4 @@
-PROVIDERS_PROFILE = [
+PROVIDERS = [
     {
         "id": 1,
         "image_path": "https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp",

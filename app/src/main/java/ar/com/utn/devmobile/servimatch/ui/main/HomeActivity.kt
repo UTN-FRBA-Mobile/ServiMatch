@@ -56,19 +56,22 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import coil.compose.AsyncImage
 
 var paddingH = 16.dp
 var paddingV = 8.dp
+
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
+
+
     //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
     val listaDeProveedores = viewModel<ListaDeProveedores>()
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
-    listaDeProveedores.getGeneral()
     LaunchedEffect(Unit) {
-        listaDeProveedores.getRecomendados()
+        listaDeProveedores.getProvedores()
     }
 
     Column(
@@ -121,9 +124,8 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(busqueda) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -134,9 +136,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.recomendados.value) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -147,9 +147,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.general.value) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -157,7 +155,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
 }
 
 @Composable
-fun Provider(imageBitmap: ImageBitmap,
+fun Provider(image: String,
              nombre: String,
              apellido: String,
              simboloPrecio: Int,
@@ -171,14 +169,15 @@ fun Provider(imageBitmap: ImageBitmap,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Imagen
-        Image(
-            bitmap = imageBitmap,
-            contentDescription = null,
+        AsyncImage(
+            model = image,
+            contentDescription = "Foto de perfil del ofertante",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
                 .border(2.dp, Turquesa3, CircleShape)
+
         )
 
         // Espacio entre la imagen y la información
