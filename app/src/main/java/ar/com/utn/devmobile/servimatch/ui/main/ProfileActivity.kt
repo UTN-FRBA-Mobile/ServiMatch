@@ -39,30 +39,53 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Naranja
 import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.Comentario
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderProfile
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 
 
 @Composable
-fun ProfileScreen( navController: NavController) {
-    val persona = personaCuidadoraMascotas //por ahora esta hardcodeado
-    val promedioPuntajes = (comentariosCuidadoraMascotas.map { it.puntaje }.average() * 10).toInt() / 10.0
-    val cantComentarios = persona.comentarios.size
-    val arguments = navController.currentBackStackEntry?.arguments
-    val idProveedor = arguments?.getString("idProveedor")
+fun ProfileScreen(navController: NavController, idProveedor: Int) {
+    var providerProfile by remember { mutableStateOf<ProviderProfile?>(PERSONAMOCKEADA) }
 
+    LaunchedEffect(Unit) {
+        val response = ApiClient.apiService.getProvider(5)
 
+        providerProfile = if (response.isSuccessful) {
+            response.body()
+        } else {
+            Log.d("ERROR", "No se pudo obtener el proveedor con id $idProveedor")
+            PERSONAMOCKEADA
+        }
+    }
 
-    Log.d("ACAAAAA -------->", idProveedor.toString());
+    providerProfile?.let { ProviderProfileContent(it) }
+}
+
+@Composable
+fun ProviderProfileContent(profile: ProviderProfile) {
+    val promedioPuntajes = (profile.comentarios.map {it.puntaje}.average() * 10).toInt() / 10.0
+    val cantComentarios = profile.comentarios.size
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical=paddingV)
+        modifier = Modifier
+            .background(Turquesa1)
+            .fillMaxWidth()
+            .padding(horizontal= paddingH,vertical=paddingV)
     ){
-        PersonalInfo(persona.foto, persona.nombre, persona.profesion, persona.ubicaciones)
-        Puntajes(persona.servicios_completados, promedioPuntajes, cantComentarios)
+        PersonalInfo(profile.imagePath, profile.nombre, profile.profesion, profile.ubicaciones)
+        Puntajes(profile.serviciosCompletados, promedioPuntajes, cantComentarios)
         BotonesAcciones()
-        Reseñas(persona.comentarios)
+        Reseñas(profile.comentarios)
     }
 }
 
@@ -185,7 +208,7 @@ fun Reseñas(comentarios: List<Comentario>) {
             itemsIndexed(comentarios) { index, comentario ->
                 ReseñaItem(
                     url = comentario.foto,
-                    nombre = comentario.nombre,
+                    nombre = comentario.nombreUsuario,
                     comentario = comentario.comentario,
                     fecha = comentario.fecha,
                     estrellas = comentario.puntaje
@@ -281,48 +304,33 @@ fun RatingBar(
 }
 
 /*ESTO ES PARA PROBAR, DUMMY DATA*/
-data class Persona(
-    val id: Int,
-    val foto: String,
-    val nombre: String,
-    val profesion: String,
-    val ubicaciones: List<String>,
-    val servicios_completados: Int,
-    val comentarios: List<Comentario>
-)
-
-data class Comentario(
-    val foto: String,
-    val nombre: String,
-    val comentario: String,
-    val fecha: String,
-    val puntaje: Double
-)
-
 val comentariosCuidadoraMascotas = listOf(
     Comentario("https://picsum.photos/id/237/300/300", "Firulais", "guau guau!!", "03/10/2023", 4.0),
     Comentario("https://picsum.photos/id/251/300/300", "Roberto", "ok, todo bien", "04/10/2023", 4.5),
+    /*
     Comentario("https://picsum.photos/id/252/300/300", "Fluffy", "Me cobro caro, esperaba algo mas economico debido a que solamente lo cuido por unos minutos", "05/10/2023", 3.0),
     Comentario("https://picsum.photos/id/253/300/300", "Luna", "Perfecto", "06/10/2023", 4.0),
     Comentario("https://picsum.photos/id/254/300/300", "Maximiliano", "Excelente servicio", "07/10/2023", 5.0),
     Comentario("https://picsum.photos/id/255/300/300", "Oliver", "Volvio peinado, perfecto", "08/10/2023", 3.5),
     Comentario("https://picsum.photos/id/256/300/300", "Roxana", "El perro vino lleno de tierra, un desastre, nunca mas!", "09/10/2023", 2.0)
+    */
 )
 
-val personaCuidadoraMascotas = Persona(
+val PERSONAMOCKEADA = ProviderProfile(
     id=5,
-    foto = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
-    nombre="Melisa Perez",
+    imagePath = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
+    nombre="Melisa",
+    apellido= "Perez",
     profesion="Cuidadora de Mascotas",
+    cantSignosPesos= 3,
     ubicaciones=listOf("Flores", "Caballito"),
-    servicios_completados = 30,
+    serviciosCompletados = 30,
     comentarios= comentariosCuidadoraMascotas
 )
-
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowProfilePreview() {
     val navController = rememberNavController()
-    ProfileScreen(navController = navController)
+    ProfileScreen(navController = navController, idProveedor = 1)
 }

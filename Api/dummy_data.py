@@ -5,7 +5,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Juan",
         "apellido": "González",
         "profesion": "Electricista",
-        "cant_signos_pesos": "$$$$$",
+        "cant_signos_pesos": 5,
         "ubicaciones": [
             "Recoleta",
             "Palermo" 
@@ -48,7 +48,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Maria",
         "apellido": "Lopez",
         "profesion": "Plomero",
-        "cant_signos_pesos": "$$$$",
+        "cant_signos_pesos": 4,
         "ubicaciones": [
             "San Telmo",
             "La Boca" 
@@ -91,7 +91,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Carlos",
         "apellido": "Martinez",
         "profesion": "Carpintero",
-        "cant_signos_pesos": "$$$",
+        "cant_signos_pesos": 3,
         "ubicaciones": [
             "Microcentro",
             "Belgrano" 
@@ -134,7 +134,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Laura",
         "apellido": "Gómez",
         "profesion": "Albañil",
-        "cant_signos_pesos": "$$$$",
+        "cant_signos_pesos": 4,
         "ubicaciones": [
             "Villa Crespo",
             "Villa Devoto"
@@ -163,7 +163,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Marcos",
         "apellido": "Rodríguez",
         "profesion": "Mecánico",
-        "cant_signos_pesos": "$$$$$",
+        "cant_signos_pesos": 5,
         "ubicaciones": [
             "Villa del Parque",
             "Núñez"
@@ -192,7 +192,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Sofía",
         "apellido": "Martínez",
         "profesion": "Jardinero",
-        "cant_signos_pesos": "$$",
+        "cant_signos_pesos": 2,
         "ubicaciones": [
             "Saavedra",
             "Flores"
@@ -221,7 +221,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Melisa",
         "apellido": "Perez",
         "profesion": "Costurera",
-        "cant_signos_pesos": "$$$$",
+        "cant_signos_pesos": 4,
         "ubicaciones": [
             "Flores",
             "Caballito" 
