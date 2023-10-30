@@ -2,6 +2,7 @@ package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
@@ -36,6 +37,8 @@ import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyScopeMarker
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
@@ -47,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
@@ -54,21 +58,24 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import com.google.gson.GsonBuilder
+import org.json.JSONObject
+import retrofit2.Response
 
 var paddingH = 16.dp
 var paddingV = 8.dp
-
-
+val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
-
     //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
     val listaDeProveedores = viewModel<ListaDeProveedores>()
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
-    listaDeProveedores.getRecomendados()
     listaDeProveedores.getGeneral()
+    LaunchedEffect(Unit) {
+        listaDeProveedores.getRecomendados()
+    }
 
     Column(
         modifier = Modifier
@@ -229,94 +236,120 @@ fun Provider(imageBitmap: ImageBitmap,
 }
 
 @Composable
-fun FilterList(listaProveedores: ListaDeProveedores){
-    val zones = listOf("Almagro", "Chacarita", "Flores")
-    val jobs = listOf("Plomero", "Cerrajero", "Electricista")
-    val prices = listOf("De Mayor a Menor", "De Menor a Mayor")
+fun FilterList(listaProveedores: ListaDeProveedores) {
+    var zones by remember { mutableStateOf(emptyList<String>()) }
+    var jobs by remember { mutableStateOf(emptyList<String>()) }
+    var rating by remember { mutableStateOf(emptyList<String>()) }
+
+    LaunchedEffect(Unit) {
+        try {
+            zones = apiService.zonas()
+            jobs = apiService.profesiones()
+            rating = apiService.rating()
+        } catch (e: Exception) {
+            // Podríamos agregar una alerta de error si falla la carga.
+            Log.d("ERROR", e.toString())
+        }
+    }
 
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Filter(
-            modifier = Modifier.weight(0.7f),
+            modifier = Modifier.weight(1f),
             "Zona",
             zones,
             listaProveedores
-        ) // Primer conjunto de filtros
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
         Filter(
-            modifier = Modifier.weight(0.7f),
+            modifier = Modifier.weight(1f),
             "Rubro",
             jobs,
             listaProveedores
-        ) // Primer conjunto de filtros
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre los filtros
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
         Filter(
-            modifier = Modifier.weight(0.7f),
-            "Precio",
-            prices,
+            modifier = Modifier.weight(1f),
+            "Valoracion",
+            rating,
             listaProveedores
         )
     }
 }
 
 @Composable
-fun Filter(modifier: Modifier = Modifier,
-
-
-
-           categoria:String,
-           items:List<String>,
-           listaProveedores: ListaDeProveedores) {
-
+fun Filter(
+    modifier: Modifier = Modifier,
+    categoria: String,
+    items: List<String>,
+    listaProveedores: ListaDeProveedores
+) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
 
     Card(
         modifier = modifier
-            .fillMaxWidth(0.25f)
-            .clickable { expanded = true }, // Agregar un Modifier.clickable
-        shape = RoundedCornerShape(8.dp), // Bordes redondeados más suaves
-        border = BorderStroke(1.dp, Color.Black) // Delineado en negro
+            .fillMaxWidth()
+            .clickable { expanded = true },
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.Black)
     ) {
         Box(
             modifier = Modifier
                 .background(
                     Color.White,
-                    shape = RoundedCornerShape(8.dp) // Bordes redondeados más suaves
+                    shape = RoundedCornerShape(8.dp)
                 ),
             content = {
                 Row(
                     modifier = Modifier
-                        .padding(8.dp) // Espaciado más pequeño
-                        .fillMaxWidth(),
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .clickable { expanded = true },
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(selectedItem, fontWeight = FontWeight.Bold)
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = null,
+                        modifier = Modifier.padding(1.dp)
                     )
                 }
             }
         )
     }
 
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        modifier = Modifier.fillMaxWidth()
+    val offsetY = (-4.dp)
+    val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
+
+    Box(
+        modifier = Modifier.offset(y = offsetY)
     ) {
-        items.forEach { item ->
-            DropdownMenuItem(
-                onClick = {
-                    listaProveedores.buscarPorFiltro(categoria,item)
-                    selectedItem = item
-                    expanded = false },
-                text = { Text(item, color = Color.Black) }
-            )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                    .offset(y = offsetY)
+                .heightIn(max = maxHeight)
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        listaProveedores.buscarPorFiltro(categoria, item)
+                        selectedItem = item
+                        expanded = false
+                    },
+                    text = { Text(item, color = Color.Black) }
+                )
+            }
         }
     }
 }

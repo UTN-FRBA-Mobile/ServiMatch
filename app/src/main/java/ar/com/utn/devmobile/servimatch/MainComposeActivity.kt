@@ -1,15 +1,12 @@
 package ar.com.utn.devmobile.servimatch
 
-import android.content.Context
+
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,9 +17,9 @@ import ar.com.utn.devmobile.servimatch.ui.main.ContactMe
 import ar.com.utn.devmobile.servimatch.ui.main.HomeScreen
 import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
-import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 
 class MainComposeActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +34,7 @@ class MainComposeActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun App() {
+
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {

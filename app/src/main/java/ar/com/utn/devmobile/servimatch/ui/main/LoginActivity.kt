@@ -1,5 +1,7 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,16 +22,34 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.ui.model.ApiService
+import ar.com.utn.devmobile.servimatch.ui.model.LoginRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
+
+
+object RetrofitInstance {
+    private const val BASE_URL = "http://192.168.1.26:5000/" // ACA HAY QUE PONER LA IP DE LA PC, Y NO LOCALHOST
+
+    val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen( navController: NavController) {
+    val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isButtonEnabled by remember { mutableStateOf(false) }
@@ -38,7 +58,6 @@ fun LoginScreen( navController: NavController) {
     val painterIcon = painterResource(id = R.drawable.servimatch)
     var isError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    var errorIcon by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) } // Nuevo estado para la animación de carga
     val viewModelScope = rememberCoroutineScope()
 
@@ -68,8 +87,6 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                unfocusedTextColor = Turquesa5,
-                focusedTextColor = Turquesa5,
             )
         )
         OutlinedTextField(
@@ -90,31 +107,40 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                unfocusedTextColor = Turquesa5,
-                focusedTextColor = Turquesa5,
                 errorSupportingTextColor = Color.Red
             )
         )
         //Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                if (!isLoading) { // Evita hacer otra solicitud mientras se está cargando
+                if (!isLoading) {
                     isLoading = true
                     isError = false
                     errorMessage = ""
-                    // Simula una carga de 3 segundos
+
+                    val loginRequest = LoginRequest(username, password)
+
                     viewModelScope.launch {
-                        //ACA TENGO QUE PEGARLE AL BACK.
-                        delay(3000)
-                        if (username == "Pablo25" && password == "pablo") {
-                            // Navegar a la pantalla de inicio y pasar el usuario como argumento
-                            navController.navigate(
-                                route = "home/${username}"
-                            )
-                        } else {
+                        try {
+                            val response = apiService.login(loginRequest)
+
+                            if (response.isSuccessful) {
+                                // La solicitud fue exitosa, puedes procesar la respuesta aquí
+                                delay(1000)
+                                navController.navigate(
+                                    route = "home/${username}"
+                                )
+                            } else {
+                                isError = true
+                                errorMessage = "Usuario y/o Contraseña incorrectos"
+                            }
+                        } catch (e: Exception) {
                             isError = true
-                            errorMessage = "Usuario y/o Contraseña incorrectos"
+                            errorMessage = "Error del Servidor. Intente mas tarde"
+                            Log.d("ERROR", e.toString());
+
                         }
+
                         isLoading = false
                     }
                 }

@@ -84,29 +84,29 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
                     .border(5.dp, Turquesa3, CircleShape),
                 contentScale = ContentScale.Crop
             )
-        Column(modifier = Modifier
-            .align(CenterVertically)
-            .padding(horizontal=4.dp))
-        {
-            Text(
-                text = nombre,
-                color = Turquesa3,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal=4.dp)
-            )
-            Text(
-                text = profesion,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(horizontal=4.dp)
-            )
-            Row(verticalAlignment = CenterVertically) {
-                Icon(imageVector = Icons.Default.Place, contentDescription = "")
+            Column(modifier = Modifier
+                .align(CenterVertically)
+                .padding(horizontal=4.dp))
+            {
                 Text(
-                    text = ubicaciones.joinToString(", ")
+                    text = nombre,
+                    color = Turquesa3,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal=4.dp)
                 )
+                Text(
+                    text = profesion,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(horizontal=4.dp)
+                )
+                Row(verticalAlignment = CenterVertically) {
+                    Icon(imageVector = Icons.Default.Place, contentDescription = "")
+                    Text(
+                        text = ubicaciones.joinToString(", ")
+                    )
+                }
             }
-        }
 
         }
     }
