@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 import ar.com.utn.devmobile.servimatch.ui.model.BodyRequestBusqueda
 import ar.com.utn.devmobile.servimatch.ui.model.FiltroAplicado
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 
 class ListaDeProveedores : ViewModel() {
+
+    val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
 
     //Esta lista se muestra en la primera mitad de la pantalla home
     val recomendados= mutableStateOf<MutableList<ProviderInfo>>(mutableListOf())
@@ -23,7 +26,15 @@ class ListaDeProveedores : ViewModel() {
     val filtrosAplicados = mutableListOf<FiltroAplicado>()
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
-    fun getRecomendados(){
+    suspend fun getRecomendados(){
+        try {
+            Log.d("--->", apiService.recomendados().toString())
+
+        } catch (e: Exception) {
+            // Podríamos agregar una alerta de error si falla la carga.
+            Log.d("--->", e.toString())
+        }
+
         recomendados.value = mutableListOf<ProviderInfo>().apply {
             add(ProviderInfo(0,R.drawable.hombre1, "Joaquin Benitez","$$$$",  "Palermo - Plomero", "plomero"))
             add( ProviderInfo(1,R.drawable.hombre2, "Eduardo Alarcón","$$$",  "Recoleta - Cerrajero", "cerrajero"))

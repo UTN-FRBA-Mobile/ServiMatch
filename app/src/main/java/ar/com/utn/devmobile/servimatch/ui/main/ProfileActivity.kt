@@ -52,9 +52,6 @@ fun ProfileScreen( navController: NavController) {
     val arguments = navController.currentBackStackEntry?.arguments
     val idProveedor = arguments?.getString("idProveedor")
 
-
-
-    Log.d("ACAAAAA -------->", idProveedor.toString());
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical=paddingV)

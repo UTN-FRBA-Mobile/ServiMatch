@@ -36,7 +36,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitInstance {
-    private const val BASE_URL = "http://10.10.0.14:5000/" // ACA HAY QUE PONER LA IP DE LA PC, Y NO LOCALHOST
+    private const val BASE_URL = "http://192.168.1.26:5000/" // ACA HAY QUE PONER LA IP DE LA PC, Y NO LOCALHOST
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -128,6 +128,7 @@ fun LoginScreen( navController: NavController) {
 
                             if (response.isSuccessful) {
                                 // La solicitud fue exitosa, puedes procesar la respuesta aquí
+                                delay(1000)
                                 navController.navigate(
                                     route = "home/${username}"
                                 )

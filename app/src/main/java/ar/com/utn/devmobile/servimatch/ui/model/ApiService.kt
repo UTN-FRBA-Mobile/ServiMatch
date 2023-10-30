@@ -17,4 +17,6 @@ interface ApiService {
     @GET("/valoraciones")
     suspend fun rating(): List<String>
 
+    @GET("/recomendados")
+    suspend fun recomendados(): List<String>
 }
