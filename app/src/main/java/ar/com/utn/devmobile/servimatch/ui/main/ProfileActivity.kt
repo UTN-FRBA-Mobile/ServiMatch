@@ -1,5 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -67,11 +68,11 @@ fun ProfileScreen(navController: NavController, idProveedor: Int) {
         }
     }
 
-    providerProfile?.let { ProviderProfileContent(it) }
+    providerProfile?.let { ProviderProfileContent(navController, it) }
 }
 
 @Composable
-fun ProviderProfileContent(profile: ProviderProfile) {
+fun ProviderProfileContent(navController: NavController, profile: ProviderProfile) {
     val promedioPuntajes = (profile.comentarios.map {it.puntaje}.average() * 10).toInt() / 10.0
     val cantComentarios = profile.comentarios.size
 
@@ -84,7 +85,7 @@ fun ProviderProfileContent(profile: ProviderProfile) {
     ){
         PersonalInfo(profile.imagePath, profile.nombre, profile.profesion, profile.ubicaciones)
         Puntajes(profile.serviciosCompletados, promedioPuntajes, cantComentarios)
-        BotonesAcciones()
+        BotonesAcciones(navController, profile)
         Reseñas(profile.comentarios)
     }
 }
@@ -106,29 +107,29 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
                     .border(5.dp, Turquesa3, CircleShape),
                 contentScale = ContentScale.Crop
             )
-        Column(modifier = Modifier
-            .align(CenterVertically)
-            .padding(horizontal=4.dp))
-        {
-            Text(
-                text = nombre,
-                color = Turquesa3,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal=4.dp)
-            )
-            Text(
-                text = profesion,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(horizontal=4.dp)
-            )
-            Row(verticalAlignment = CenterVertically) {
-                Icon(imageVector = Icons.Default.Place, contentDescription = "")
+            Column(modifier = Modifier
+                .align(CenterVertically)
+                .padding(horizontal=4.dp))
+            {
                 Text(
-                    text = ubicaciones.joinToString(", ")
+                    text = nombre,
+                    color = Turquesa3,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal=4.dp)
                 )
+                Text(
+                    text = profesion,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(horizontal=4.dp)
+                )
+                Row(verticalAlignment = CenterVertically) {
+                    Icon(imageVector = Icons.Default.Place, contentDescription = "")
+                    Text(
+                        text = ubicaciones.joinToString(", ")
+                    )
+                }
             }
-        }
 
         }
     }
@@ -166,20 +167,20 @@ fun PuntajeItem(puntaje: Number, texto: String) {
 }
 
 @Composable
-fun BotonesAcciones() {
+fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Boton("Reservar")
-        Boton("Contactame")
+        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}")})
+        Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.nombre}")})
     }
 }
 
 @Composable
-fun Boton(texto: String) {
+fun Boton(texto: String, onClick: ()->Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Turquesa3,
             contentColor = Color.White,
@@ -328,7 +329,7 @@ val PERSONAMOCKEADA = ProviderProfile(
     comentarios= comentariosCuidadoraMascotas
 )
 
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowProfilePreview() {
     val navController = rememberNavController()

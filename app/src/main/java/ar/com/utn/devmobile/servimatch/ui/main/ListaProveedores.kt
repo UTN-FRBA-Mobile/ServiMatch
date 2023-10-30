@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 import ar.com.utn.devmobile.servimatch.ui.model.BodyRequestBusqueda
 import ar.com.utn.devmobile.servimatch.ui.model.FiltroAplicado
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
@@ -23,19 +25,27 @@ class ListaDeProveedores : ViewModel() {
     val filtrosAplicados = mutableListOf<FiltroAplicado>()
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
-    fun getRecomendados(){
+    suspend fun getRecomendados(){
+        try {
+            Log.d("--->", ApiClient.apiService.recomendados().toString())
+
+        } catch (e: Exception) {
+            // Podríamos agregar una alerta de error si falla la carga.
+            Log.d("--->", e.toString())
+        }
+
         recomendados.value = mutableListOf<ProviderInfo>().apply {
-            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin Benitez","$$$$",  "Palermo - Plomero", "plomero"))
-            add( ProviderInfo(1,R.drawable.hombre2, "Eduardo Alarcón","$$$",  "Recoleta - Cerrajero", "cerrajero"))
-            add(ProviderInfo(2,R.drawable.mujer1, "Maria Esperanza","$$",  "Belgrano - Plomero", "Plomero"))
+            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin", "Benitez",4,  listOf("Palermo"), "plomero", true))
+            add( ProviderInfo(1,R.drawable.hombre2, "Eduardo", "Alarcón",3,  listOf("Recoleta"), "cerrajero", true))
+            add(ProviderInfo(2,R.drawable.mujer1, "Maria", "Esperanza",2,  listOf("Belgrano"), "Plomero", true))
         }
     }
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get general.
     fun getGeneral(){
         general.value = mutableListOf<ProviderInfo>().apply {
-            add(ProviderInfo(3,R.drawable.hombre3, "Lucas Sainz","$$",  "Flores - Reparación Aire Acondicionado", "reparacion aire acondicionado"))
-            add(ProviderInfo(4,R.drawable.mujer2, "Eugenia Romano","$",  "Caballito - Limpieza Hogar ", "limpieza hogar"))
+            add(ProviderInfo(3,R.drawable.hombre3, "Lucas", "Sainz",2,  listOf("Flores"), "reparacion aire acondicionado", false))
+            add(ProviderInfo(4,R.drawable.mujer2, "Eugenia", "Romano",1,  listOf("Caballito"), "limpieza hogar", false))
 
         }
     }
@@ -61,9 +71,9 @@ class ListaDeProveedores : ViewModel() {
         //Le pego y me traigo los proveedores. Los cargo en la lista de busqueda, cuando deje de ser vacia se renderiza.
         busqueda.value = mutableListOf<ProviderInfo>().apply {
             addAll(busqueda.value)
-            add( ProviderInfo(2,R.drawable.mujer1, "Maria Esperanza","$$",  "Belgrano - Plomero", "plomero")
+            add( ProviderInfo(2,R.drawable.mujer1, "Maria", "Esperanza",2,  listOf("Belgrano"), "plomero", true)
             )
-            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin Benitez","$$$$",  "Palermo - Plomero", "plomero"),
+            add(ProviderInfo(0,R.drawable.hombre1, "Joaquin", "Benitez",4,  listOf("Palermo"), "plomero", false),
             )
 
         }

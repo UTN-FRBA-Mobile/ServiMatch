@@ -1,7 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.model
 
 import org.json.JSONObject
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,4 +20,6 @@ interface ApiService {
 
     @GET("/providers/{id}")
     suspend fun getProvider(@Path("id") id: Int): Response<ProviderProfile>
+    @GET("/recomendados")
+    suspend fun recomendados(): List<String>
 }

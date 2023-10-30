@@ -14,6 +14,7 @@ def healthcheck():
     return {"message": "i'm alive"}, 200
 
 
+
 @app.route('/tipoProfesion', methods=['GET'])
 def tipoServicio():
     try:
@@ -142,7 +143,20 @@ def zonas():
     except Exception as e:
         return 500
 
-
+@app.route('/recomendados',methods=['GET'])
+def recomendados():
+	try:
+		recomendados = [{
+			"id":0,
+			"path":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
+			"nombre":"Joaquin Benitez",
+			"precioCategoria":"$$$$",
+			"ubicación":"Palermo",
+			"rol":"plomero"
+		}]
+		return jsonify(recomendados),200
+	except Exception as e:
+		return 500
 
 @app.route('/usuarios', methods=['GET'])
 def comentarios():

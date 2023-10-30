@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 import ar.com.utn.devmobile.servimatch.ui.model.LoginRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
@@ -34,21 +35,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-
-object RetrofitInstance {
-    private const val BASE_URL = "http://10.10.0.14:5000/" // ACA HAY QUE PONER LA IP DE LA PC, Y NO LOCALHOST
-
-    val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen( navController: NavController) {
-    val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -87,7 +76,6 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                textColor = Turquesa5
             )
         )
         OutlinedTextField(
@@ -108,7 +96,6 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                textColor = Turquesa5,
                 errorSupportingTextColor = Color.Red
             )
         )
@@ -124,10 +111,12 @@ fun LoginScreen( navController: NavController) {
 
                     viewModelScope.launch {
                         try {
-                            val response = apiService.login(loginRequest)
+                            val response = ApiClient.apiService.login(loginRequest)
 
                             if (response.isSuccessful) {
                                 // La solicitud fue exitosa, puedes procesar la respuesta aquí
+
+                                delay(1000)
                                 navController.navigate(
                                     route = "home/${username}"
                                 )

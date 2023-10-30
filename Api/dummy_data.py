@@ -6,6 +6,7 @@ PROVIDERS_PROFILE = [
         "apellido": "González",
         "profesion": "Electricista",
         "cant_signos_pesos": 5,
+        "recomendado": True,
         "ubicaciones": [
             "Recoleta",
             "Palermo" 
@@ -49,6 +50,7 @@ PROVIDERS_PROFILE = [
         "apellido": "Lopez",
         "profesion": "Plomero",
         "cant_signos_pesos": 4,
+        "recomendado": True,
         "ubicaciones": [
             "San Telmo",
             "La Boca" 
@@ -92,6 +94,7 @@ PROVIDERS_PROFILE = [
         "apellido": "Martinez",
         "profesion": "Carpintero",
         "cant_signos_pesos": 3,
+        "recomendado": False,
         "ubicaciones": [
             "Microcentro",
             "Belgrano" 
@@ -135,6 +138,7 @@ PROVIDERS_PROFILE = [
         "apellido": "Gómez",
         "profesion": "Albañil",
         "cant_signos_pesos": 4,
+        "recomendado": False,
         "ubicaciones": [
             "Villa Crespo",
             "Villa Devoto"
@@ -164,6 +168,7 @@ PROVIDERS_PROFILE = [
         "apellido": "Rodríguez",
         "profesion": "Mecánico",
         "cant_signos_pesos": 5,
+        "recomendado": False,
         "ubicaciones": [
             "Villa del Parque",
             "Núñez"
@@ -192,6 +197,7 @@ PROVIDERS_PROFILE = [
         "nombre": "Sofía",
         "apellido": "Martínez",
         "profesion": "Jardinero",
+        "recomendado": False,
         "cant_signos_pesos": 2,
         "ubicaciones": [
             "Saavedra",
@@ -222,6 +228,7 @@ PROVIDERS_PROFILE = [
         "apellido": "Perez",
         "profesion": "Costurera",
         "cant_signos_pesos": 4,
+        "recomendado": True,
         "ubicaciones": [
             "Flores",
             "Caballito" 
