@@ -3,6 +3,7 @@ from flask import Flask, request
 import datetime
 from flask import Flask
 from flask import Blueprint, jsonify
+from dummy_data import PROVIDERS_PROFILE
 
 
 app = Flask("serviceMatch")
@@ -210,8 +211,7 @@ def comentarios():
 						'comentario1': {
 							'comentarioId': 1,
 							'mensaje': 'Mensaje 1',
-                            'puntajeAsignado': 100
-						},
+                            'puntajeAsignado': 100 },
 						'comentario2': {
 							'comentarioId': 2,
 							'mensaje': 'Mensaje 2',
@@ -243,8 +243,19 @@ def comentarios():
         return {'error': str(e)}, 500
 
 
+@app.route('/providers/',methods=['GET'])
+def providers():
+    try:
+        return jsonify(PROVIDERS_PROFILE), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-
+@app.route('/providers/<int:provider_id>',methods=['GET'])
+def provider_profile(provider_id):
+    provider = next((provider for provider in PROVIDERS_PROFILE if provider["id"] == provider_id), None)
+    if provider is not None:
+        return jsonify(provider), 200
+    return jsonify({'error': f"no se pudo encontrar el proveedor {provider_id}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
