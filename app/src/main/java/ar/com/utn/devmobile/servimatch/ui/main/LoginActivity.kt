@@ -68,7 +68,8 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                textColor = Turquesa5
+                unfocusedTextColor = Turquesa5,
+                focusedTextColor = Turquesa5,
             )
         )
         OutlinedTextField(
@@ -89,7 +90,8 @@ fun LoginScreen( navController: NavController) {
                 focusedBorderColor = Turquesa3, // Color del borde cuando el campo está enfocado
                 unfocusedBorderColor = Turquesa5, // Color del borde cuando el campo no está enfocado
                 focusedLabelColor = Turquesa3,
-                textColor = Turquesa5,
+                unfocusedTextColor = Turquesa5,
+                focusedTextColor = Turquesa5,
                 errorSupportingTextColor = Color.Red
             )
         )
