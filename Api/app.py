@@ -1,3 +1,4 @@
+import math
 import sys
 from flask import Flask, request
 import datetime
@@ -256,9 +257,27 @@ def comentarios():
     except Exception as e:
         return {'error': str(e)}, 500
 
+@app.route('/distancia', methods=['GET'])
+def test():
+    try:
+        return str(distancia(-34.622050, -58.379983, -34.616399, -58.380299)), 200
+    except Exception as e:
+        return {'error': str(e)}, 500
 
 
+def distancia(lat1, lon1, lat2, lon2):
+	R = 6371  # Radio de la Tierra en kilómetros
 
+	dLat = math.radians(lat2 - lat1)
+	dLon = math.radians(lon2 - lon1)
+
+	a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(math.radians(lat1)) * math.cos(
+		math.radians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2)
+
+	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+	distancia = R * c * 1000  # Distancia en metros
+	return distancia
 
 if __name__ == '__main__':
     app.run(debug=True)
