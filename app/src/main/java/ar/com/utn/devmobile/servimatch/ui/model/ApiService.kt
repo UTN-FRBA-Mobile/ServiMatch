@@ -10,8 +10,6 @@ import retrofit2.http.Path
 interface ApiService {
     @POST("/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<JSONObject>
-    @GET("/zonas")
-    suspend fun zonas(): List<String>
     @GET("/tipoProfesion")
     suspend fun profesiones(): List<String>
 

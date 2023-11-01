@@ -231,13 +231,11 @@ fun Provider(image: String,
 
 @Composable
 fun FilterList(listaProveedores: ListaDeProveedores) {
-    var zones by remember { mutableStateOf(emptyList<String>()) }
     var jobs by remember { mutableStateOf(emptyList<String>()) }
     var rating by remember { mutableStateOf(emptyList<String>()) }
 
     LaunchedEffect(Unit) {
         try {
-            zones = ApiClient.apiService.zonas()
             jobs = ApiClient.apiService.profesiones()
             rating = ApiClient.apiService.rating()
         } catch (e: Exception) {
@@ -247,24 +245,16 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     }
 
     LaunchedEffect(Unit) {
-        zones = ApiClient.apiService.zonas()
         jobs= ApiClient.apiService.profesiones()
         rating= ApiClient.apiService.rating()
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Filter(
-            modifier = Modifier.weight(1f),
-            "Zona",
-            zones,
-            listaProveedores
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
 
         Filter(
             modifier = Modifier.weight(1f),

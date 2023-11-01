@@ -67,7 +67,7 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/zonas', methods=['GET'])
+""" @app.route('/zonas', methods=['GET'])
 def zonas():
     try:
         zonas = [	
@@ -141,7 +141,7 @@ def zonas():
         ]	
         return jsonify(zonas),200
     except Exception as e:
-        return "Error", 500
+        return "Error", 500 """
 
 @app.route('/recomendados',methods=['GET'])
 def recomendados():
