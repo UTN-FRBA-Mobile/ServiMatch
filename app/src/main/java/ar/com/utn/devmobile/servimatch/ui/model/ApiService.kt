@@ -5,6 +5,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("/login")
@@ -17,6 +18,8 @@ interface ApiService {
     @GET("/valoraciones")
     suspend fun rating(): List<String>
 
-    @GET("/recomendados")
-    suspend fun recomendados(): List<String>
+    @GET("/providers/{id}")
+    suspend fun getProvider(@Path("id") id: Int): Response<ProviderProfile>
+    @GET("/providers/")
+    suspend fun getProviders(): Response<List<ProviderInfo>>
 }

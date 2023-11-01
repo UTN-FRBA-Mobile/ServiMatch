@@ -19,7 +19,6 @@ import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
 
 class MainComposeActivity : ComponentActivity() {
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +28,9 @@ class MainComposeActivity : ComponentActivity() {
     }
 }
 
-
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun App() {
-
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -50,8 +46,7 @@ private fun App() {
         composable(
             route = "profile/{idProveedor}"
         ) {
-            /*aca se haria un fetch con el id y se pasaria la persona mapeada de json a objeto, ni idea*/
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController = navController, idProveedor = id)
         }
 
         composable(

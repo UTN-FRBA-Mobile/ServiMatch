@@ -2,7 +2,6 @@ package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
@@ -34,11 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
-import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.PurpleGrey40
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyScopeMarker
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
@@ -48,9 +44,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ar.com.utn.devmobile.servimatch.ui.model.ApiService
+import androidx.navigation.compose.rememberNavController
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
@@ -58,23 +56,22 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
-import com.google.gson.GsonBuilder
-import org.json.JSONObject
-import retrofit2.Response
+import coil.compose.AsyncImage
 
 var paddingH = 16.dp
 var paddingV = 8.dp
-val apiService = RetrofitInstance.retrofit.create(ApiService::class.java)
+
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
+
+
     //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
     val listaDeProveedores = viewModel<ListaDeProveedores>()
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
-    listaDeProveedores.getGeneral()
     LaunchedEffect(Unit) {
-        listaDeProveedores.getRecomendados()
+        listaDeProveedores.getProvedores()
     }
 
     Column(
@@ -127,9 +124,8 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(busqueda) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -140,9 +136,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.recomendados.value) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -153,9 +147,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.general.value) { providerInfo ->
-                    val imageBitmap: ImageBitmap =
-                        ImageBitmap.Companion.imageResource(context.resources, providerInfo.imageResource)
-                    Provider(imageBitmap, providerInfo.name,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -163,10 +155,11 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
 }
 
 @Composable
-fun Provider(imageBitmap: ImageBitmap,
+fun Provider(image: String,
              nombre: String,
-             simboloPrecio: String,
-             ubicacion: String,
+             apellido: String,
+             simboloPrecio: Int,
+             ubicaciones: List<String>,
              navController: NavController,
              identificador: Number) {
     Row(
@@ -176,14 +169,15 @@ fun Provider(imageBitmap: ImageBitmap,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Imagen
-        Image(
-            bitmap = imageBitmap,
-            contentDescription = null,
+        AsyncImage(
+            model = image,
+            contentDescription = "Foto de perfil del ofertante",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
                 .border(2.dp, Turquesa3, CircleShape)
+
         )
 
         // Espacio entre la imagen y la información
@@ -194,19 +188,19 @@ fun Provider(imageBitmap: ImageBitmap,
             modifier = Modifier.weight(1f) // Permite que la columna ocupe el espacio disponible
         ) {
             Text(
-                text = nombre,
+                text = "$nombre, $apellido",
                 style = TextStyle(fontWeight = FontWeight.Bold),
                 fontSize = 20.sp,
                 color = Turquesa5
             )
             Text(
                 //text = "Desde $precio",
-                text = simboloPrecio,
+                text = buildString {repeat(simboloPrecio){append("$")}},
                 fontSize = 16.sp,
                 color = Purpura3
             )
             Text(
-                text = "$ubicacion",
+                text = ubicaciones.joinToString(", "),
                 color = Purpura2
             )
         }
@@ -243,15 +237,20 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
 
     LaunchedEffect(Unit) {
         try {
-            zones = apiService.zonas()
-            jobs = apiService.profesiones()
-            rating = apiService.rating()
+            zones = ApiClient.apiService.zonas()
+            jobs = ApiClient.apiService.profesiones()
+            rating = ApiClient.apiService.rating()
         } catch (e: Exception) {
             // Podríamos agregar una alerta de error si falla la carga.
             Log.d("ERROR", e.toString())
         }
     }
 
+    LaunchedEffect(Unit) {
+        zones = ApiClient.apiService.zonas()
+        jobs= ApiClient.apiService.profesiones()
+        rating= ApiClient.apiService.rating()
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -327,6 +326,7 @@ fun Filter(
         )
     }
 
+
     val offsetY = (-4.dp)
     val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
 
@@ -398,4 +398,11 @@ fun Header(navController: NavController, username: String, paddingH: Dp, padding
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ShowHomePreview() {
+    val navController = rememberNavController()
+    HomeScreen(navController= navController, username="pedro")
 }
