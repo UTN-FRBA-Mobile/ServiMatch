@@ -11,6 +11,9 @@ PROVIDERS = [
             "Recoleta",
             "Palermo" 
         ],
+        "latitud": -34.608550,
+        "longitud": -58.427796,
+        "rangoMax": 100,
         "servicios_completados": 10,
         "comentarios": [
             {
@@ -55,6 +58,9 @@ PROVIDERS = [
             "San Telmo",
             "La Boca" 
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 100,
         "servicios_completados": 30,
         "comentarios": [
             {
@@ -99,6 +105,9 @@ PROVIDERS = [
             "Microcentro",
             "Belgrano" 
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 5000,
         "servicios_completados": 20,
         "comentarios": [
             {
@@ -143,6 +152,9 @@ PROVIDERS = [
             "Villa Crespo",
             "Villa Devoto"
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 5000,
         "servicios_completados": 5,
         "comentarios": [
             {
@@ -173,6 +185,9 @@ PROVIDERS = [
             "Villa del Parque",
             "Núñez"
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 5000,
         "servicios_completados": 15,
         "comentarios": [
             {
@@ -203,6 +218,9 @@ PROVIDERS = [
             "Saavedra",
             "Flores"
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 5000,
         "servicios_completados": 25,
         "comentarios": [
             {
@@ -233,6 +251,9 @@ PROVIDERS = [
             "Flores",
             "Caballito" 
         ],
+        "latitud": -34.608728,
+        "longitud": -58.427796,
+        "rangoMax": 100,
         "servicios_completados": 10,
         "comentarios": [
             {

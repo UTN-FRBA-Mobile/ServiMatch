@@ -1,9 +1,9 @@
+import json
 import math
 import sys
 import datetime
 from flask import Blueprint, jsonify, Flask, request
 from dummy_data import PROVIDERS
-
 
 app = Flask("serviceMatch")
 
@@ -13,34 +13,34 @@ def healthcheck():
     return {"message": "i'm alive"}, 200
 
 
-
 @app.route('/tipoProfesion', methods=['GET'])
 def tipoServicio():
     try:
-        profesiones = [	
+        profesiones = [
             'Electricista'
-            ,'Plomero'
-            ,'Carpintero'
-            ,'Albañil'
-            ,'Mecánico'
-            ,'Jardinero'
-            ,'Herrero'
-            ,'Zapatero'
-            ,'Costurero'
-            ,'Pintor'
-            ,'Gasista'
-            ,'Limpieza a domicilio'
-            ,'Técnico en aire acondicionado'
-            ,'Técnico en refrigeración'
-            ,'Técnico en computadoras'
-            ,'Técnico en electrodomésticos'
-        ]	
+            , 'Plomero'
+            , 'Carpintero'
+            , 'Albañil'
+            , 'Mecánico'
+            , 'Jardinero'
+            , 'Herrero'
+            , 'Zapatero'
+            , 'Costurero'
+            , 'Pintor'
+            , 'Gasista'
+            , 'Limpieza a domicilio'
+            , 'Técnico en aire acondicionado'
+            , 'Técnico en refrigeración'
+            , 'Técnico en computadoras'
+            , 'Técnico en electrodomésticos'
+        ]
 
         return jsonify(profesiones), 200
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/valoraciones', methods=['GET']) 
+
+@app.route('/valoraciones', methods=['GET'])
 def valoraciones():
     try:
         valoracion = [
@@ -52,7 +52,8 @@ def valoraciones():
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/login',methods=['POST'])
+
+@app.route('/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
@@ -65,6 +66,7 @@ def login():
             return jsonify({'message': 'Login error'}), 403
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 """ @app.route('/zonas', methods=['GET'])
 def zonas():
@@ -142,18 +144,19 @@ def zonas():
     except Exception as e:
         return "Error", 500 """
 
-@app.route('/recomendados',methods=['GET'])
+
+@app.route('/recomendados', methods=['GET'])
 def recomendados():
     try:
         recomendados = [{
-        "id":0,
-        "path":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
-        "nombre":"Joaquin Benitez",
-        "precioCategoria":"$$$$",
-        "ubicación":"Palermo",
-        "rol":"plomero"
-    }]
-        return jsonify(recomendados),200
+            "id": 0,
+            "path": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
+            "nombre": "Joaquin Benitez",
+            "precioCategoria": "$$$$",
+            "ubicación": "Palermo",
+            "rol": "plomero"
+        }]
+        return jsonify(recomendados), 200
     except Exception as e:
         return "Error", 500
 
@@ -225,7 +228,7 @@ def comentarios():
                     'comentario1': {
                         'comentarioId': 1,
                         'mensaje': 'Mensaje 1',
-                        'puntajeAsignado': 100 },
+                        'puntajeAsignado': 100},
                     'comentario2': {
                         'comentarioId': 2,
                         'mensaje': 'Mensaje 2',
@@ -256,34 +259,45 @@ def comentarios():
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/distancia', methods=['GET'])
-def test():
-    try:
-        return str(distancia(-34.622050, -58.379983, -34.616399, -58.380299)), 200
-    except Exception as e:
-        return {'error': str(e)}, 500
 
-@app.route('/providers/',methods=['GET'])
+@app.route('/providers/', methods=['GET'])
 def providers():
     try:
         return jsonify(PROVIDERS), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+def filterByDistancia(proveedor, latitudCliente, longitudCliente):
+    latitudProveedor = proveedor['latitud']
+    longitudProveedor = proveedor['longitud']
+    rangoMaxProveedor = proveedor['rangoMax']
+    if (rangoMaxProveedor > distancia(latitudCliente, longitudCliente, latitudProveedor, longitudProveedor)):
+        return True
+    else:
+        return False
+
 def distancia(lat1, lon1, lat2, lon2):
-	R = 6371  # Radio de la Tierra en kilómetros
+    R = 6371  # Radio de la Tierra en kilómetros
+    dLat = math.radians(lat2 - lat1)
+    dLon = math.radians(lon2 - lon1)
+    a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(math.radians(lat1)) * math.cos(
+        math.radians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distancia = R * c * 1000  # Distancia en metros
+    return distancia
 
-	dLat = math.radians(lat2 - lat1)
-	dLon = math.radians(lon2 - lon1)
+@app.route('/providersByCoordinates', methods=['GET'])
+def getProvidersByCoordinates():
+    try:
+        latitudCliente = float(request.args.get('latitud'))
+        longitudCliente = float(request.args.get('longitud'))
+        filterFunc = list(filter(lambda x: filterByDistancia(x, latitudCliente, longitudCliente), PROVIDERS))
+        return jsonify(filterFunc), 200
+    except Exception as e:
+        return {'error': str(e)}, 500
 
-	a = math.sin(dLat / 2) * math.sin(dLat / 2) + math.cos(math.radians(lat1)) * math.cos(
-		math.radians(lat2)) * math.sin(dLon / 2) * math.sin(dLon / 2)
-
-	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-	distancia = R * c * 1000  # Distancia en metros
-	return distancia
-@app.route('/providers/<int:provider_id>',methods=['GET'])
+@app.route('/providers/<int:provider_id>', methods=['GET'])
 def provider_profile(provider_id):
     provider = next((provider for provider in PROVIDERS if provider["id"] == provider_id), None)
     if provider is not None:
