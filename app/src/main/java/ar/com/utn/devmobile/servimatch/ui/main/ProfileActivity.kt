@@ -210,7 +210,7 @@ fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}")})
+        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}/${persona.precio_visita}/[mañana,tarde]")})
         Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.nombre}")})
     }
 }
@@ -346,13 +346,7 @@ fun RatingBar(
 val comentariosCuidadoraMascotas = listOf(
     Comentario("https://picsum.photos/id/237/300/300", "Firulais", "guau guau!!", "03/10/2023", 4.0),
     Comentario("https://picsum.photos/id/251/300/300", "Roberto", "ok, todo bien", "04/10/2023", 4.5),
-    /*
-    Comentario("https://picsum.photos/id/252/300/300", "Fluffy", "Me cobro caro, esperaba algo mas economico debido a que solamente lo cuido por unos minutos", "05/10/2023", 3.0),
-    Comentario("https://picsum.photos/id/253/300/300", "Luna", "Perfecto", "06/10/2023", 4.0),
-    Comentario("https://picsum.photos/id/254/300/300", "Maximiliano", "Excelente servicio", "07/10/2023", 5.0),
-    Comentario("https://picsum.photos/id/255/300/300", "Oliver", "Volvio peinado, perfecto", "08/10/2023", 3.5),
-    Comentario("https://picsum.photos/id/256/300/300", "Roxana", "El perro vino lleno de tierra, un desastre, nunca mas!", "09/10/2023", 2.0)
-    */
+
 )
 
 val PERSONAMOCKEADA = ProviderProfile(
@@ -363,8 +357,10 @@ val PERSONAMOCKEADA = ProviderProfile(
     profesion="Cuidadora de Mascotas",
     cantSignosPesos= 3,
     ubicaciones=listOf("Flores", "Caballito"),
+    disponibilidad=listOf("mañana"),
     serviciosCompletados = 30,
-    comentarios= comentariosCuidadoraMascotas
+    comentarios= comentariosCuidadoraMascotas,
+    precio_visita="3870"
 )
 
 @Preview(showBackground = true, showSystemUi = true)

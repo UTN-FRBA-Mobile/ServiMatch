@@ -50,11 +50,20 @@ private fun App() {
         }
 
         composable(
-            route = "booking/{username}",
-            arguments = listOf(navArgument("username") { type = NavType.StringType })
+            route = "booking/{username}/{precio}/{disponibilidad}",
+            arguments = listOf(
+                navArgument("username") { type = NavType.StringType },
+                navArgument("precio") { type = NavType.StringType },
+                navArgument("disponibilidad") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            BookingScreen(navController = navController,username = username, precioConsulta="5500")
+            val precio = backStackEntry.arguments?.getString("precio") ?: ""
+            val disponibilidadString  = backStackEntry.arguments?.getString("disponibilidad") ?: ""
+            // Convierte la cadena de "disponibilidad" en un array de cadenas
+            val disponibilidad = disponibilidadString.split(",").toTypedArray()
+
+            BookingScreen(navController = navController, username = username, precioConsulta = precio, disponibilidad = disponibilidad)
         }
 
         composable(

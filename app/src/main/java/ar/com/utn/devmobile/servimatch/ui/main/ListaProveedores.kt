@@ -2,7 +2,9 @@ package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
@@ -17,6 +19,8 @@ fun List<ProviderInfo>?.safeAccess(block: (List<ProviderInfo>) -> Unit) {
 
 class ListaDeProveedores : ViewModel() {
 
+    // Declarar una variable mutable para el indicador de carga
+    var isLoading = true
     //Esta lista se muestra en la primera mitad de la pantalla home
     val recomendados= mutableStateOf<MutableList<ProviderInfo>>(mutableListOf())
 
@@ -32,23 +36,23 @@ class ListaDeProveedores : ViewModel() {
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
     suspend fun getProvedores(){
         try {
+
             val response = ApiClient.apiService.getProviders()
             val providers = response.body()
             providers.safeAccess{ providersInfo ->
                 recomendados.value = providersInfo.filter { it -> it.isRecommended }.toMutableList()
                 general.value = providersInfo.filter { it -> !it.isRecommended }.toMutableList()
             }
+            isLoading = false
         } catch (e: Exception) {
+            isLoading = false
             // Podríamos agregar una alerta de error si falla la carga.
             Log.d("--->", e.toString())
         }
 
-        /*recomendados.value = mutableListOf<ProviderInfo>().apply {
-            add(ProviderInfo(0, "https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Joaquin", "Benitez",4,  listOf("Palermo"), "plomero", true))
-            add( ProviderInfo(1,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Eduardo", "Alarcón",3,  listOf("Recoleta"), "cerrajero", true))
-            add(ProviderInfo(2,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Maria", "Esperanza",2,  listOf("Belgrano"), "Plomero", true))
-        }*/
     }
+
+
 
     //  Esta funcion se dispara cuando se aprieta algun filtro en el HomeActivity. En el composable Filter.
     fun buscarPorFiltro(categoria: String, valor: String) {

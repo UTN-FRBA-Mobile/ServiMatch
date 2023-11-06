@@ -22,9 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +36,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -46,11 +45,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
-
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
@@ -58,22 +55,19 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-
 
 
 var paddingH = 16.dp
 var paddingV = 8.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
 
-
     //Cargo el viewModel que va a gestionar la lista de proveedores que se muestra.
     val listaDeProveedores = viewModel<ListaDeProveedores>()
+    // Acceder a la variable isLoading
+    val isLoading = listaDeProveedores.isLoading
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
@@ -83,14 +77,11 @@ fun HomeScreen(navController: NavController, username: String) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Turquesa1)
-
+                .padding(horizontal = paddingH, vertical = paddingV),
+            verticalArrangement = Arrangement.Top
         )
         {
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(horizontal = paddingH, vertical = paddingV),
-                verticalArrangement = Arrangement.Top
-            ) {
+
                 Spacer(modifier = Modifier.height(0.dp))
 
 
@@ -99,6 +90,15 @@ fun HomeScreen(navController: NavController, username: String) {
 
                 Spacer(modifier = Modifier.height(16.dp)) // Espacio entre header y filtros
 
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    ) // Muestra la animación de carga
+                }
+            } else {
                 //Renderizo lista de filtros
                 FilterList(listaDeProveedores)
 
@@ -107,6 +107,8 @@ fun HomeScreen(navController: NavController, username: String) {
                 //Renderizo lista de Proveedores. Inicialmente renderiza las listas recomendados y general.
                 ProvidersList(navController, listaDeProveedores)
             }
+
+
     }
 }
 
@@ -249,12 +251,10 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             Log.d("ERROR", e.toString())
         }
     }
-
     LaunchedEffect(Unit) {
         jobs= ApiClient.apiService.profesiones()
         rating= ApiClient.apiService.rating()
     }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -5,8 +5,10 @@ PROVIDERS = [
         "nombre": "Juan",
         "apellido": "González",
         "profesion": "Electricista",
+        "precio_visita":"7000",
         "cant_signos_pesos": 5,
         "recomendado": True,
+        "disponibilidad":["mañana,tarde"],
         "ubicaciones": [
             "Recoleta",
             "Palermo" 
@@ -52,6 +54,7 @@ PROVIDERS = [
         "nombre": "Maria",
         "apellido": "Lopez",
         "profesion": "Plomero",
+        "precio_visita":"5300",
         "cant_signos_pesos": 4,
         "recomendado": True,
         "ubicaciones": [
@@ -100,6 +103,7 @@ PROVIDERS = [
         "apellido": "Martinez",
         "profesion": "Carpintero",
         "cant_signos_pesos": 3,
+        "precio_visita":"4000",
         "recomendado": False,
         "ubicaciones": [
             "Microcentro",
@@ -147,6 +151,7 @@ PROVIDERS = [
         "apellido": "Gómez",
         "profesion": "Albañil",
         "cant_signos_pesos": 4,
+        "precio_visita":"4400",
         "recomendado": False,
         "ubicaciones": [
             "Villa Crespo",
@@ -180,6 +185,7 @@ PROVIDERS = [
         "apellido": "Rodríguez",
         "profesion": "Mecánico",
         "cant_signos_pesos": 5,
+        "precio_visita":"7000",
         "recomendado": False,
         "ubicaciones": [
             "Villa del Parque",
@@ -214,6 +220,7 @@ PROVIDERS = [
         "profesion": "Jardinero",
         "recomendado": False,
         "cant_signos_pesos": 2,
+         "precio_visita":"2000",
         "ubicaciones": [
             "Saavedra",
             "Flores"
@@ -246,6 +253,7 @@ PROVIDERS = [
         "apellido": "Perez",
         "profesion": "Costurera",
         "cant_signos_pesos": 4,
+        "precio_visita":"3900",
         "recomendado": True,
         "ubicaciones": [
             "Flores",

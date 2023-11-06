@@ -2,6 +2,7 @@ package ar.com.utn.devmobile.servimatch.ui.main
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,9 +48,10 @@ import java.time.ZoneId
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BookingScreen(navController: NavController, username: String, precioConsulta: String) {
+fun BookingScreen(navController: NavController, username: String, precioConsulta: String,disponibilidad: Array<String>) {
 
     var turnoSelected by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,7 +60,7 @@ fun BookingScreen(navController: NavController, username: String, precioConsulta
     {
         Header(navController)
         DatePickerSection()
-        TurnoSection(turnoSelected)
+        TurnoSection(turnoSelected,disponibilidad)
         ReservarSection(turnoSelected, precioConsulta)
     }
 }
@@ -95,7 +97,7 @@ fun DatePickerSection() {
 }
 
 @Composable
-fun TurnoSection(turnoSelected : String) {
+fun TurnoSection(turnoSelected : String,disponibilidad: Array<String>) {
     var selectedItem by remember { mutableStateOf(turnoSelected) }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -159,11 +161,11 @@ fun ReservarSection(turnoSelected: String, precioConsulta: String) {
             ){
                 Text(modifier = Modifier
                     .padding(horizontal = paddingH, vertical = paddingV),
-                    text = precioConsulta + "$"
+                    text = "$"+precioConsulta
                 )
                 Button(
                     onClick = {
-
+                        Log.d("Reserva ----->",turnoSelectedSelected)
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
