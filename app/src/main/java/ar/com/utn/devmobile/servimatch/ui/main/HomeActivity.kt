@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
@@ -57,10 +58,15 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+
+
 
 var paddingH = 16.dp
 var paddingV = 8.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController, username: String) {
@@ -73,34 +79,34 @@ fun HomeScreen(navController: NavController, username: String) {
     LaunchedEffect(Unit) {
         listaDeProveedores.getProvedores()
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Turquesa1)
-    )
-    {
         Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(horizontal = paddingH, vertical = paddingV),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Spacer(modifier = Modifier.height(0.dp))
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Turquesa1)
 
-            //Renderizo header.
-            Header(navController, username, 0.dp, 0.dp)
+        )
+        {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = paddingH, vertical = paddingV),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.height(0.dp))
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre header y filtros
 
-            //Renderizo lista de filtros
-            FilterList(listaDeProveedores)
+                //Renderizo header.
+                Header(navController, username, 0.dp, 0.dp)
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre filtros y recomendados
+                Spacer(modifier = Modifier.height(16.dp)) // Espacio entre header y filtros
 
-            //Renderizo lista de Proveedores. Inicialmente renderiza las listas recomendados y general.
-            ProvidersList(navController, listaDeProveedores)
+                //Renderizo lista de filtros
+                FilterList(listaDeProveedores)
 
-        }
+                Spacer(modifier = Modifier.height(16.dp)) // Espacio entre filtros y recomendados
+
+                //Renderizo lista de Proveedores. Inicialmente renderiza las listas recomendados y general.
+                ProvidersList(navController, listaDeProveedores)
+            }
     }
 }
 

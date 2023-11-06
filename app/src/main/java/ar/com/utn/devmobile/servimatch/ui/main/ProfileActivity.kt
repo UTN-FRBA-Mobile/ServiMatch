@@ -4,10 +4,12 @@ import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
@@ -40,6 +43,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Naranja
 import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,11 +51,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.Comentario
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderProfile
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 
 @Composable
 fun ProfileScreen(navController: NavController, idProveedor: Int) {
@@ -71,9 +79,33 @@ fun ProfileScreen(navController: NavController, idProveedor: Int) {
             }
         }
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Turquesa1)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth().background(Turquesa1).zIndex(10f),
+                verticalAlignment = Alignment.CenterVertically
 
-    providerProfile?.let { ProviderProfileContent(navController, it) }
+            ) {
+                IconButton(
+                    onClick = { navController.navigateUp() },
+                    modifier = Modifier.padding(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Perfil Proovedor"
+                    )
+                }
+                Text(text = "Volver")
+            }
+            providerProfile?.let { ProviderProfileContent(navController, it) }
+        }
+    }
 }
+
 
 @Composable
 fun ProviderProfileContent(navController: NavController, profile: ProviderProfile) {
@@ -84,10 +116,12 @@ fun ProviderProfileContent(navController: NavController, profile: ProviderProfil
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(Turquesa1)
+            .fillMaxSize()
             .fillMaxWidth()
             .padding(horizontal= paddingH,vertical=paddingV)
     ){
-        PersonalInfo(profile.imagePath, profile.nombre, profile.profesion, profile.ubicaciones)
+
+        PersonalInfo(profile.imagePath, profile.nombre, profile.profesion, profile.ubicaciones,navController)
         Puntajes(profile.serviciosCompletados, promedioPuntajes, cantComentarios)
         BotonesAcciones(navController, profile)
         Reseñas(profile.comentarios)
@@ -95,49 +129,49 @@ fun ProviderProfileContent(navController: NavController, profile: ProviderProfil
 }
 
 @Composable
-fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>) {
-    Column ()
-    {
-        Row(
-            modifier=Modifier.padding(top=4.dp)
-        ) {
-            AsyncImage(
-                model = foto,
-                contentDescription = "Foto de perfil del ofertante",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(color = Turquesa3, CircleShape)
-                    .border(5.dp, Turquesa3, CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Column(modifier = Modifier
-                .align(CenterVertically)
-                .padding(horizontal=4.dp))
-            {
-                Text(
-                    text = nombre,
-                    color = Turquesa3,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal=4.dp)
+fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>, navController: NavController) {
+    Column {
+            Row(
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                AsyncImage(
+                    model = foto,
+                    contentDescription = "Foto de perfil del ofertante",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(color = Turquesa3, CircleShape)
+                        .border(5.dp, Turquesa3, CircleShape),
+                    contentScale = ContentScale.Crop
                 )
-                Text(
-                    text = profesion,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(horizontal=4.dp)
-                )
-                Row(verticalAlignment = CenterVertically) {
-                    Icon(imageVector = Icons.Default.Place, contentDescription = "")
+                Column(
+                    modifier = Modifier
+                        .align(CenterVertically)
+                        .padding(horizontal = 4.dp)
+                ) {
                     Text(
-                        text = ubicaciones.joinToString(", ")
+                        text = nombre,
+                        color = Turquesa3,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 4.dp)
                     )
+                    Text(
+                        text = profesion,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.Place, contentDescription = "")
+                        Text(text = ubicaciones.joinToString(", "))
+                    }
                 }
             }
-
         }
-    }
 }
+
+
+
 
 @Composable
 fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
@@ -254,9 +288,9 @@ fun ReseñaItem(url: String, nombre: String, comentario: String, fecha: String, 
         ){
             Text(
                 text = nombre,
-                color = Color.LightGray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
+                color = Purpura2,
+                fontSize = 15.sp,
+                //fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = comentario,
