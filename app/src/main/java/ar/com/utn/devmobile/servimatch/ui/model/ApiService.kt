@@ -18,6 +18,10 @@ interface ApiService {
 
     @GET("/providers/{id}")
     suspend fun getProvider(@Path("id") id: Int): Response<ProviderProfile>
+
+    @GET("/providers/{id}")
+    suspend fun getProviderContacts(@Path("id") id: Int): Response<ProviderContacts>
+
     @GET("/providers/")
     suspend fun getProviders(): Response<List<ProviderInfo>>
 }

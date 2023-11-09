@@ -17,6 +17,7 @@ import ar.com.utn.devmobile.servimatch.ui.main.ContactMe
 import ar.com.utn.devmobile.servimatch.ui.main.HomeScreen
 import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
+import ar.com.utn.devmobile.servimatch.ui.main.MapScreen
 
 class MainComposeActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -36,6 +37,13 @@ private fun App() {
         composable("login") {
             LoginScreen(navController = navController)
         }
+
+        composable(
+            route = "map"
+        ) {
+            MapScreen(navController = navController)
+        }
+
         composable(
             route = "home/{username}",
             arguments = listOf(navArgument("username") { type = NavType.StringType })
@@ -43,10 +51,11 @@ private fun App() {
             val username = backStackEntry.arguments?.getString("username") ?: ""
             HomeScreen(navController = navController,username = username)
         }
+
         composable(
             route = "profile/{idProveedor}"
         ) {
-            ProfileScreen(navController = navController, idProveedor = id)
+            ProfileScreen(navController = navController)
         }
 
         composable(
@@ -67,11 +76,9 @@ private fun App() {
         }
 
         composable(
-            route = "contactMe/{username}",
-            arguments = listOf(navArgument("username") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            ContactMe(navController = navController,username = username)
+            route = "contactMe/{providerId}",
+        ) {
+            ContactMe(navController = navController)
         }
     }
 }

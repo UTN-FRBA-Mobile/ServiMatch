@@ -62,7 +62,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 
 @Composable
-fun ProfileScreen(navController: NavController, idProveedor: Int) {
+fun ProfileScreen(navController: NavController) {
     var providerProfile by remember { mutableStateOf<ProviderProfile?>(PERSONAMOCKEADA) }
     val arguments = navController.currentBackStackEntry?.arguments
     val idProveedor = arguments?.getString("idProveedor")
@@ -121,7 +121,7 @@ fun ProviderProfileContent(navController: NavController, profile: ProviderProfil
             .padding(horizontal= paddingH,vertical=paddingV)
     ){
 
-        PersonalInfo(profile.imagePath, profile.nombre, profile.profesion, profile.ubicaciones,navController)
+        PersonalInfo(profile.imagePath, profile.nombre, profile.apellido, profile.profesion, profile.ubicaciones,navController)
         Puntajes(profile.serviciosCompletados, promedioPuntajes, cantComentarios)
         BotonesAcciones(navController, profile)
         Reseñas(profile.comentarios)
@@ -129,7 +129,7 @@ fun ProviderProfileContent(navController: NavController, profile: ProviderProfil
 }
 
 @Composable
-fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: List<String>, navController: NavController) {
+fun PersonalInfo(foto: String, nombre: String, apellido: String, profesion: String, ubicaciones: List<String>, navController: NavController) {
     Column {
             Row(
                 modifier = Modifier.padding(top = 4.dp)
@@ -150,7 +150,7 @@ fun PersonalInfo(foto: String, nombre: String, profesion: String, ubicaciones: L
                         .padding(horizontal = 4.dp)
                 ) {
                     Text(
-                        text = nombre,
+                        text = "$nombre $apellido",
                         color = Turquesa3,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -211,7 +211,7 @@ fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}/${persona.precio_visita}/[mañana,tarde]")})
-        Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.nombre}")})
+        Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.id}")})
     }
 }
 
@@ -367,5 +367,5 @@ val PERSONAMOCKEADA = ProviderProfile(
 @Composable
 fun ShowProfilePreview() {
     val navController = rememberNavController()
-    ProfileScreen(navController = navController, idProveedor = 1)
+    ProfileScreen(navController = navController)
 }
