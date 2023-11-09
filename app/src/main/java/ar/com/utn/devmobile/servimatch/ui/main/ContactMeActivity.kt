@@ -1,83 +1,196 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
+import android.R
+import android.graphics.drawable.Icon
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import ar.com.utn.devmobile.servimatch.ui.model.Contacts
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderContacts
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import coil.compose.AsyncImage
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.theme.Naranja
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ContactMe(navController: NavController, username: String) {
+fun ContactMe(navController: NavController) {
+    var providerContacts by remember { mutableStateOf<ProviderContacts?>(CONTACTOS_MOCKEADOS) }
+    val arguments = navController.currentBackStackEntry?.arguments
+    val id = arguments?.getString("providerId")?.toInt()
+
+    LaunchedEffect(Unit) {
+        val response = id?.let { ApiClient.apiService.getProviderContacts(it) }
+
+        if (response != null) {
+            providerContacts = if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.d("ERROR", "No se pudo obtener el proveedor con id $id")
+                CONTACTOS_MOCKEADOS
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Turquesa1),
-        horizontalAlignment = Alignment.CenterHorizontally)
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    )
     {
         Header(navController)
-        Body(username)
+        providerContacts?.let { Body(it) }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Body(username : String) {
-    val context = LocalContext.current
+fun Body(provider : ProviderContacts) {
+    Banner(provider)
+    DetallesContacto(provider)
+}
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Box(
+@Composable
+fun Banner(provider : ProviderContacts) {
+    Box (
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.height(250.dp)
+    ){
+        AsyncImage(
+            model = provider.image,
+            contentDescription = "Banner",
             modifier = Modifier
-                .fillMaxWidth(0.8f) // Este Box ocupa la mitad del espacio del Row
-                .padding(end = 8.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = "Detalles de contacto",
-                style = MaterialTheme.typography.headlineSmall,
-                color = Turquesa4,
-            )
-        }
+                .blur(15.dp, 15.dp)
+                .background(color = Turquesa2, RectangleShape)
+                .fillMaxWidth()
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        AsyncImage(
+            model = provider.image,
+            contentDescription = "Foto de perfil del ofertante",
+            modifier = Modifier
+                .size(200.dp)
+                .clip(CircleShape)
+                .background(color = Turquesa3, CircleShape)
+                .border(5.dp, Turquesa3, CircleShape),
+            contentScale = ContentScale.Crop
+        )
 
-        // Datos de contacto
-        ContactDetailItem("Nombre", username)
-        ContactDetailItem("Correo Electrónico", "mperez@example.com")
-        ContactDetailItem("Teléfono", "+1234567890")
-        ContactDetailItem("Zona de trabajo", "Flores, Caballito")
     }
 }
 
 @Composable
-fun ContactDetailItem(label: String, value: String) {
-    Row(
+fun DetallesContacto(provider: ProviderContacts) {
+    Text(
+        text = "Detalles de contacto",
+        fontSize = 25.sp,
+        fontWeight = FontWeight.Bold,
+        color = Purpura2,
+        modifier = Modifier
+            .padding(top = 20.dp)
+    )
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 15.dp)
+    ) {
+        ContactDetailItem(Icons.Outlined.Person, "Nombre", "${provider.nombre} ${provider.apellido}")
+        ContactDetailItem(Icons.Outlined.PinDrop, "Zonas", provider.area.joinToString(", "))
+        ContactDetailItem(Icons.Outlined.Phone, "Telefono", provider.contactos.telefono)
+        ContactDetailItem(Icons.Outlined.Email, "Email", provider.contactos.email)
+    }
+}
+
+@Composable
+fun ContactDetailItem(icon: ImageVector, dato: String, texto: String) {
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column {
-            Text(text = label, fontWeight = FontWeight.Bold, modifier = Modifier.width(100.dp))
-        }
-        Column {
-            Text(text = value)
+    ){
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier
+                .scale(2f)
+                .padding(horizontal = 15.dp)
+        )
+        Column(
+            verticalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.padding(horizontal = 50.dp)
+        ) {
+            Text(
+                text = dato,
+                fontWeight = FontWeight.Light,
+                fontSize = 17.sp,
+            )
+            Text(
+                text = texto,
+                fontSize = 17.sp,
+            )
         }
     }
+    Divider()
+}
+
+//--------------------------------------------------------------//
+
+val CONTACTOS_MOCKEADOS = ProviderContacts(
+    nombre = "Melisa",
+    apellido = "Perez",
+    image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
+    contactos = Contacts(
+        email = "mperez@example.com",
+        telefono = "+1234567890"
+    ),
+    area = listOf("Flores", "Caballito")
+)
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewContactMe() {
+    val navController = rememberNavController()
+    ContactMe(navController = navController)
 }

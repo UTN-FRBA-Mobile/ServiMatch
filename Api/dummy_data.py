@@ -17,6 +17,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 100,
         "servicios_completados": 10,
+        "medios_de_contacto": {
+            "telefono": "+1144562893",
+            "email": "jgonzalez@example.com"
+        }, 
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/302/300/300",
@@ -65,6 +69,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 100,
         "servicios_completados": 30,
+        "medios_de_contacto": {
+            "telefono": "+1234567890",
+            "email": "mperez@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/203/300/300",
@@ -113,6 +121,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 5000,
         "servicios_completados": 20,
+        "medios_de_contacto": {
+            "telefono": "+1225489632",
+            "email": "cmartinez@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/205/300/300",
@@ -161,6 +173,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 5000,
         "servicios_completados": 5,
+        "medios_de_contacto": {
+            "telefono": "+1225418596",
+            "email": "laura_gomez@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/213/300/300",
@@ -195,6 +211,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 5000,
         "servicios_completados": 15,
+        "medios_de_contacto": {
+            "telefono": "+1221365874",
+            "email": "marquitos_rod@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/215/300/300",
@@ -220,7 +240,7 @@ PROVIDERS = [
         "profesion": "Jardinero",
         "recomendado": False,
         "cant_signos_pesos": 2,
-         "precio_visita":"2000",
+        "precio_visita":"2000",
         "ubicaciones": [
             "Saavedra",
             "Flores"
@@ -229,6 +249,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 5000,
         "servicios_completados": 25,
+        "medios_de_contacto": {
+            "telefono": "+1225144152",
+            "email": "sofi_jardin@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/217/300/300",
@@ -263,6 +287,10 @@ PROVIDERS = [
         "longitud": -58.427796,
         "rangoMax": 100,
         "servicios_completados": 10,
+        "medios_de_contacto": {
+            "telefono": "+1234567890",
+            "email": "mperez@example.com"
+        },
         "comentarios": [
             {
                 "image_path": "https://picsum.photos/id/237/300/300",
