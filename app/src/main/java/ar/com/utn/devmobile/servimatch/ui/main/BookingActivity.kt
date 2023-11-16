@@ -48,10 +48,9 @@ import java.time.ZoneId
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BookingScreen(navController: NavController, username: String, precioConsulta: String,disponibilidad: Array<String>) {
+fun BookingScreen(navController: NavController, username: String, precioConsulta: String, disponibilidad: List<String>) {
 
     var turnoSelected by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -97,7 +96,10 @@ fun DatePickerSection() {
 }
 
 @Composable
-fun TurnoSection(turnoSelected : String,disponibilidad: Array<String>) {
+fun TurnoSection(turnoSelected : String,disponibilidad: List<String>) {
+
+
+
     var selectedItem by remember { mutableStateOf(turnoSelected) }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -108,7 +110,7 @@ fun TurnoSection(turnoSelected : String,disponibilidad: Array<String>) {
             onClick = {
                 selectedItem = "manana"
             },
-            enabled = true,
+            enabled = disponibilidad.any { it.equals("Mañana", ignoreCase = true) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedItem === "manana") Purpura2 else Turquesa3,
                 contentColor = Color.White,
@@ -125,7 +127,7 @@ fun TurnoSection(turnoSelected : String,disponibilidad: Array<String>) {
             onClick = {
                 selectedItem = "tarde"
             },
-            enabled = true,
+            enabled = disponibilidad.any { it.equals("Tarde", ignoreCase = true) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedItem === "tarde") Purpura2 else Turquesa3,
                 contentColor = Color.White,

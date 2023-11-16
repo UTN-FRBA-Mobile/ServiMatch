@@ -8,7 +8,10 @@ PROVIDERS = [
         "precio_visita":"7000",
         "cant_signos_pesos": 5,
         "recomendado": True,
-        "disponibilidad":["mañana,tarde"],
+        "disponibilidad":[
+            "Mañana",
+            "Tarde"
+        ],
         "ubicaciones": [
             "Recoleta",
             "Palermo" 
@@ -61,6 +64,9 @@ PROVIDERS = [
         "precio_visita":"5300",
         "cant_signos_pesos": 4,
         "recomendado": True,
+        "disponibilidad":[
+            "Mañana"
+        ],
         "ubicaciones": [
             "San Telmo",
             "La Boca" 
@@ -113,6 +119,9 @@ PROVIDERS = [
         "cant_signos_pesos": 3,
         "precio_visita":"4000",
         "recomendado": False,
+        "disponibilidad":[
+            "Mañana"
+        ],       
         "ubicaciones": [
             "Microcentro",
             "Belgrano" 
@@ -165,6 +174,9 @@ PROVIDERS = [
         "cant_signos_pesos": 4,
         "precio_visita":"4400",
         "recomendado": False,
+        "disponibilidad":[
+            "Tarde"
+        ],
         "ubicaciones": [
             "Villa Crespo",
             "Villa Devoto"
@@ -203,6 +215,9 @@ PROVIDERS = [
         "cant_signos_pesos": 5,
         "precio_visita":"7000",
         "recomendado": False,
+        "disponibilidad":[
+            "Ninguna"
+        ],
         "ubicaciones": [
             "Villa del Parque",
             "Núñez"
@@ -241,6 +256,10 @@ PROVIDERS = [
         "recomendado": False,
         "cant_signos_pesos": 2,
         "precio_visita":"2000",
+        "disponibilidad":[
+            "Mañana",
+            "Tarde"
+        ],
         "ubicaciones": [
             "Saavedra",
             "Flores"
@@ -279,6 +298,10 @@ PROVIDERS = [
         "cant_signos_pesos": 4,
         "precio_visita":"3900",
         "recomendado": True,
+        "disponibilidad":[
+            "Mañana",
+            "Tarde"
+        ],
         "ubicaciones": [
             "Flores",
             "Caballito" 
