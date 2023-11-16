@@ -206,11 +206,15 @@ fun PuntajeItem(puntaje: Number, texto: String) {
 
 @Composable
 fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
+    val disponibilidad = persona.disponibilidad
+    //laburo necesario que hago para pasar la lista y que no se reciba anidada dentro de otra lista.
+    val disponibilidadStr = disponibilidad.joinToString(",")
+
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}/${persona.precio_visita}/[mañana,tarde]")})
+        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}/${persona.precio_visita}/$disponibilidadStr")})
         Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.id}")})
     }
 }

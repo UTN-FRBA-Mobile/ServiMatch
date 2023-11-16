@@ -70,7 +70,7 @@ private fun App() {
             val precio = backStackEntry.arguments?.getString("precio") ?: ""
             val disponibilidadString  = backStackEntry.arguments?.getString("disponibilidad") ?: ""
             // Convierte la cadena de "disponibilidad" en un array de cadenas
-            val disponibilidad = disponibilidadString.split(",").toTypedArray()
+            val disponibilidad = disponibilidadString.split(",").map { it.trim() }
 
             BookingScreen(navController = navController, username = username, precioConsulta = precio, disponibilidad = disponibilidad)
         }
