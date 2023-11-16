@@ -1,8 +1,7 @@
-import json
 import math
-import sys
-import datetime
-from flask import Blueprint, jsonify, Flask, request
+import uuid
+from flask import jsonify, Flask, request
+from reservas import RESERVAS
 from dummy_data import PROVIDERS
 
 app = Flask("serviceMatch")
@@ -157,7 +156,7 @@ def recomendados():
             "rol": "plomero"
         }]
         return jsonify(recomendados), 200
-    except Exception as e:
+    except Exception as _:
         return "Error", 500
 
 
@@ -305,6 +304,40 @@ def provider_profile(provider_id):
     if provider is not None:
         return jsonify(provider), 200
     return jsonify({'error': f"no se pudo encontrar el proveedor {provider_id}"}), 500
+
+
+"""RUTAS PARA RESERVAS"""
+
+@app.route('/providers/<int:provider_id>/reservas', methods=['POST'])
+def create_reserva(provider_id):
+    try:
+        data = request.get_json()
+        data["id"] = str(uuid.uuid4())
+        data["provider_id"] = provider_id
+        data["accepted"] = False
+        print(data)
+        RESERVAS.append(data)
+        date = data["date"]
+        return jsonify({"message": f"Se creo una solicitud para el dia {date}"}), 200
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/providers/<int:provider_id>/reservas/', methods=['GET'])
+def get_reservas(provider_id):
+    try:
+        reservas_provider = list(filter(lambda reserva: reserva["provider_id"] is provider_id and not reserva["accepted"], RESERVAS))
+        return jsonify({"reservas": reservas_provider}), 200
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/reservas/<string:reserva_id>', methods=['PATCH'])
+def accept_reserva(reserva_id):
+    reserva = next((reserva for reserva in RESERVAS if reserva["id"] == reserva_id), None)
+    if reserva is not None:
+        reserva["accepted"] = True
+        #enviar notificacion a token
+        return jsonify({"message": f"aceptaste la reserva {reserva_id}"}), 200
+    return jsonify({'error': f"no se pudo encontrar la reserva con id {reserva_id}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
