@@ -290,8 +290,10 @@ def distancia(lat1, lon1, lat2, lon2):
 @app.route('/providersByCoordinates', methods=['GET'])
 def getProvidersByCoordinates():
     try:
-        latitudCliente = float(request.args.get('latitud'))
-        longitudCliente = float(request.args.get('longitud'))
+        latitudCliente_str = request.args.get('latitud')
+        longitudCliente_str = request.args.get('longitud')
+        latitudCliente = float(latitudCliente_str) if latitudCliente_str is not None else None
+        longitudCliente = float(longitudCliente_str) if longitudCliente_str is not None else None
         filterFunc = list(filter(lambda x: filterByDistancia(x, latitudCliente, longitudCliente), PROVIDERS))
         return jsonify(filterFunc), 200
     except Exception as e:
