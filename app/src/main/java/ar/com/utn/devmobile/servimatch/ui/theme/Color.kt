@@ -24,4 +24,6 @@ val Purpura1 = Color(0xFFB3A8D2)
 val Purpura2 = Color(0xFF6750A4)
 val Purpura3 = Color(0xFF342852)
 
+val AzulOscuro = Color(0xFF001F3F)
+
 val VerdePrecio = Color(0xFF1AAB0E)

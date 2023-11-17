@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -41,6 +42,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
+import ar.com.utn.devmobile.servimatch.ui.theme.AzulOscuro
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -51,19 +53,61 @@ import java.time.ZoneId
 fun BookingScreen(navController: NavController, username: String, precioConsulta: String, disponibilidad: List<String>) {
 
     var turnoSelected by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) } // Variable para controlar la visibilidad del AlertDialog
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Turquesa1),
-        horizontalAlignment = Alignment.CenterHorizontally)
-    {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Header(navController)
         DatePickerSection()
-        TurnoSection(turnoSelected,disponibilidad)
-        ReservarSection(turnoSelected, precioConsulta)
+        TurnoSection(turnoSelected, disponibilidad, onTurnoSelected = { nuevoTurno ->
+            turnoSelected = nuevoTurno
+            // Aquí puedes realizar cualquier acción adicional que necesites después de seleccionar un nuevo turno
+            // Por ejemplo, imprimir el nuevo turno:
+            Log.d("nuevo","Nuevo turno seleccionado: $nuevoTurno")
+        })
+        ReservarSection(turnoSelected, precioConsulta, showDialog) { showDialog = true }
+    }
+
+    // AlertDialog que se muestra cuando showDialog es true
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                // Se llama cuando el usuario toca fuera del AlertDialog
+                showDialog = false
+            },
+            title = {
+                Text("Reserva Creada: "+turnoSelected);
+            },
+            confirmButton = {
+                Button(
+
+                    onClick = {
+                        // Puedes realizar acciones adicionales aquí si es necesario
+                        showDialog = false
+                    },
+                    enabled = true,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Turquesa3,
+                        contentColor = Color.White,
+                        disabledContainerColor = Turquesa2,
+                        disabledContentColor = Turquesa3
+                    )
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            modifier = Modifier
+                .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
+                .background(AzulOscuro) // Cambiar el color de fondo a oscuro
+        )
+
+
     }
 }
-
 @Composable
 fun Header(navController: NavController) {
     Row(
@@ -96,11 +140,9 @@ fun DatePickerSection() {
 }
 
 @Composable
-fun TurnoSection(turnoSelected : String,disponibilidad: List<String>) {
-
-
-
+    fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSelected: (String) -> Unit) {
     var selectedItem by remember { mutableStateOf(turnoSelected) }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -108,7 +150,8 @@ fun TurnoSection(turnoSelected : String,disponibilidad: List<String>) {
     ) {
         Button(
             onClick = {
-                selectedItem = "manana"
+                onTurnoSelected("Mañana")
+                selectedItem="manana"
             },
             enabled = disponibilidad.any { it.equals("Mañana", ignoreCase = true) },
             colors = ButtonDefaults.buttonColors(
@@ -125,7 +168,8 @@ fun TurnoSection(turnoSelected : String,disponibilidad: List<String>) {
         }
         Button(
             onClick = {
-                selectedItem = "tarde"
+                onTurnoSelected("Tarde")
+                selectedItem="tarde"
             },
             enabled = disponibilidad.any { it.equals("Tarde", ignoreCase = true) },
             colors = ButtonDefaults.buttonColors(
@@ -144,8 +188,8 @@ fun TurnoSection(turnoSelected : String,disponibilidad: List<String>) {
 }
 
 @Composable
-fun ReservarSection(turnoSelected: String, precioConsulta: String) {
-    var turnoSelectedSelected by remember { mutableStateOf(turnoSelected) }
+fun ReservarSection(turnoSelected: String, precioConsulta: String, showDialog: Boolean, onConfirm: () -> Unit) {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom,
@@ -160,14 +204,17 @@ fun ReservarSection(turnoSelected: String, precioConsulta: String) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-            ){
-                Text(modifier = Modifier
-                    .padding(horizontal = paddingH, vertical = paddingV),
-                    text = "$"+precioConsulta
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = paddingH, vertical = paddingV),
+                    text = "$" + precioConsulta
                 )
                 Button(
                     onClick = {
-                        Log.d("Reserva ----->",turnoSelectedSelected)
+                        // Llamamos a la función proporcionada cuando se presiona el botón
+                        onConfirm()
+                        Log.d("Muestro reserva",turnoSelected)
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -182,11 +229,9 @@ fun ReservarSection(turnoSelected: String, precioConsulta: String) {
                     Text(text = "Confirmar")
                 }
             }
-
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
