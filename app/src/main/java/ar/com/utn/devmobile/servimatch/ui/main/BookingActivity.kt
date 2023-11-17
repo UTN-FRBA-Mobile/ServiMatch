@@ -102,7 +102,7 @@ fun BookingScreen(navController: NavController, username: String, precioConsulta
             },
             modifier = Modifier
                 .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
-                .background(AzulOscuro) // Cambiar el color de fondo a oscuro
+
         )
 
 
