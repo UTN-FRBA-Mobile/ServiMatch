@@ -76,14 +76,14 @@ fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(navController)
-        DatePickerSection()
+        DatePickerSection(dateState)
         TurnoSection(turnoSelected, disponibilidad, onTurnoSelected = { nuevoTurno ->
             turnoSelected = nuevoTurno
             // Aquí puedes realizar cualquier acción adicional que necesites después de seleccionar un nuevo turno
             // Por ejemplo, imprimir el nuevo turno:
             Log.d("nuevo","Nuevo turno seleccionado: $nuevoTurno")
         })
-        ReservarSection(turnoSelected, precioConsulta, showDialog) { showDialog = true }
+        ReservarSection(turnoSelected, dateState, sharedViewModel, precioConsulta, showDialog) { showDialog = true }
     }
 
     // AlertDialog que se muestra cuando showDialog es true
@@ -213,7 +213,7 @@ fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSel
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservarSection(turnoSelected: String, precioConsulta: String, showDialog: Boolean, onConfirm: () -> Unit) {
+fun ReservarSection(turnoSelected: String, dateState: DatePickerState, sharedViewModel: SharedViewModel, precioConsulta: String, showDialog: Boolean, onConfirm: () -> Unit) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -284,4 +284,17 @@ fun millisToDate(millis: Long?): String {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun LocalDateTime.toMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+fun validateDays(timestamp: Long): Boolean {
+    val currentDate = LocalDate.now()
+    val yesterday = currentDate.minusDays(1)
+    val fiveDaysLater = currentDate.plusDays(5)
+    val randomDay = LocalDate.of(2023, 12, 15)
+
+    val selectedLocalDate = Instant.ofEpochMilli(timestamp)
+        .atZone(ZoneOffset.UTC)
+        .toLocalDate()
+
+
+    return !(selectedLocalDate.isBefore(yesterday) || selectedLocalDate.isEqual(fiveDaysLater) || selectedLocalDate.isEqual(randomDay))
+}
+

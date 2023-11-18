@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
@@ -37,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen( navController: NavController) {
+fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) {
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -115,7 +116,7 @@ fun LoginScreen( navController: NavController) {
 
                             if (response.isSuccessful) {
                                 // La solicitud fue exitosa, puedes procesar la respuesta aquí
-
+                                sharedViewModel.updateUsername(username)
                                 delay(1000)
                                 navController.navigate(
                                     route = "home/${username}"
