@@ -84,42 +84,9 @@ fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel
             Log.d("nuevo","Nuevo turno seleccionado: $nuevoTurno")
         })
         ReservarSection(turnoSelected, dateState, sharedViewModel, precioConsulta, showDialog) { showDialog = true }
-    }
-
-    // AlertDialog que se muestra cuando showDialog es true
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                // Se llama cuando el usuario toca fuera del AlertDialog
-                showDialog = false
-            },
-            title = {
-                Text("Reserva Creada: "+turnoSelected);
-            },
-            confirmButton = {
-                Button(
-
-                    onClick = {
-                        // Puedes realizar acciones adicionales aquí si es necesario
-                        showDialog = false
-                    },
-                    enabled = true,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Turquesa3,
-                        contentColor = Color.White,
-                        disabledContainerColor = Turquesa2,
-                        disabledContentColor = Turquesa3
-                    )
-                ) {
-                    Text("Aceptar")
-                }
-            },
-            modifier = Modifier
-                .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
-
-        )
-
-
+        if (showDialog) {
+            ShowAlertDialog(turnoSelected, dateState, sharedViewModel, precioConsulta) { showDialog = false }
+        }
     }
 }
 
@@ -145,6 +112,41 @@ fun Header(navController: NavController) {
         }
         Text(text = "Volver")
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowAlertDialog(turnoSelected: String, dateState: DatePickerState, sharedViewModel: SharedViewModel, precioConsulta: String, toggleDialog: () -> Unit) {
+    val text = if (turnoSelected != "") "Reserva Creada: $turnoSelected" else "Debe seleccionar un turno"
+
+    AlertDialog(
+        onDismissRequest = {
+            toggleDialog()
+        },
+        title = {
+            Text(text);
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    toggleDialog()
+                },
+                enabled = true,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Turquesa3,
+                    contentColor = Color.White,
+                    disabledContainerColor = Turquesa2,
+                    disabledContentColor = Turquesa3
+                )
+            ) {
+                Text("Aceptar")
+            }
+        },
+        modifier = Modifier
+            .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
+
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -237,11 +239,14 @@ fun ReservarSection(turnoSelected: String, dateState: DatePickerState, sharedVie
                 )
                 Button(
                     onClick = {
-                        // Llamamos a la función proporcionada cuando se presiona el botón
                         onConfirm()
-                        Log.d("Turno reserva", turnoSelected)
-                        Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
-                        Log.d("Username reserva", sharedViewModel.username.value)
+                        if (turnoSelected != "") {
+                            Log.d("reserva", "ENVIANDO AL BACK")
+                            Log.d("Turno reserva", turnoSelected)
+                            Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
+                            Log.d("Username reserva", sharedViewModel.username.value)
+                            Log.d("Precio consulta reserva", precioConsulta)
+                        }
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
