@@ -1,6 +1,7 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 
+import android.app.DatePickerDialog
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -21,12 +22,15 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,17 +47,27 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.AzulOscuro
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 
-
+@ExperimentalMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BookingScreen(navController: NavController, username: String, precioConsulta: String, disponibilidad: List<String>) {
+fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel, username: String, precioConsulta: String, disponibilidad: List<String>) {
 
     var turnoSelected by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) } // Variable para controlar la visibilidad del AlertDialog
+    val dateState = rememberDatePickerState(
+        yearRange = (2023..2024),
+        initialSelectedDateMillis = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+        initialDisplayMode = DisplayMode.Picker,
+        initialDisplayedMonthMillis = null
+    )
 
     Column(
         modifier = Modifier
@@ -108,10 +122,15 @@ fun BookingScreen(navController: NavController, username: String, precioConsulta
 
     }
 }
+
+
 @Composable
 fun Header(navController: NavController) {
     Row(
-        modifier = Modifier.fillMaxWidth().background(Turquesa1).zIndex(10f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Turquesa1)
+            .zIndex(10f),
         verticalAlignment = Alignment.CenterVertically
 
     ) {
@@ -128,19 +147,23 @@ fun Header(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePickerSection() {
+fun DatePickerSection(dateState: DatePickerState) {
     Row(
-        modifier = Modifier.fillMaxWidth().offset(y=(-35).dp).zIndex(-1f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = (-35).dp)
+            .zIndex(-1f),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CustomDatePicker()
+        CustomDatePicker(dateState)
     }
 }
 
 @Composable
-    fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSelected: (String) -> Unit) {
+fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSelected: (String) -> Unit) {
     var selectedItem by remember { mutableStateOf(turnoSelected) }
 
     Row(
@@ -187,6 +210,8 @@ fun DatePickerSection() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReservarSection(turnoSelected: String, precioConsulta: String, showDialog: Boolean, onConfirm: () -> Unit) {
 
@@ -214,7 +239,9 @@ fun ReservarSection(turnoSelected: String, precioConsulta: String, showDialog: B
                     onClick = {
                         // Llamamos a la función proporcionada cuando se presiona el botón
                         onConfirm()
-                        Log.d("Muestro reserva",turnoSelected)
+                        Log.d("Turno reserva", turnoSelected)
+                        Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
+                        Log.d("Username reserva", sharedViewModel.username.value)
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -235,17 +262,25 @@ fun ReservarSection(turnoSelected: String, precioConsulta: String, showDialog: B
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CustomDatePicker(){
-    val dateTime = LocalDateTime.now()
-    val datePickerState = remember {
-        DatePickerState(
-            yearRange = (2023..2024),
-            initialSelectedDateMillis = dateTime.toMillis(),
-            initialDisplayMode = DisplayMode.Picker,
-            initialDisplayedMonthMillis = null
-        )
+fun CustomDatePicker(dateState: DatePickerState){
+    DatePicker(
+		state = dateState,
+        dateValidator = { timestamp -> validateDays(timestamp) }
+        //dateValidator = { timestamp ->
+        //    timestamp > LocalDate.now().minusDays(1).toMillis() || timestamp == LocalDate.now().plusDays(5).toMillis()
+        //}
+	)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun millisToDate(millis: Long?): String {
+    millis?.let { nonNullMillis ->
+        val localDate = Instant.ofEpochMilli(nonNullMillis).atZone(ZoneOffset.UTC).toLocalDate()
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+        return localDate.format(formatter)
+    } ?: run {
+        return "Fecha no seleccionada"
     }
-    DatePicker(state = datePickerState)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
