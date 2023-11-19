@@ -10,6 +10,13 @@ import retrofit2.http.Path
 interface ApiService {
     @POST("/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<JSONObject>
+
+    @POST("/providers/{provider_id}/reservas")
+    suspend fun createReserva(
+        @Path("provider_id") providerId: Int,
+        @Body loginRequest: ReservaRequest
+    ): Response<JSONObject>
+
     @GET("/tipoProfesion")
     suspend fun profesiones(): List<String>
 
