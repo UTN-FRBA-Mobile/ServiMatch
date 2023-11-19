@@ -308,20 +308,23 @@ def provider_profile(provider_id):
 
 """RUTAS PARA RESERVAS"""
 
+# Crea una reserva para el provider <provider_id>
 @app.route('/providers/<int:provider_id>/reservas', methods=['POST'])
 def create_reserva(provider_id):
     try:
         data = request.get_json()
+        print(f"Data limpia: {data}")
         data["id"] = str(uuid.uuid4())
         data["provider_id"] = provider_id
         data["accepted"] = False
-        print(data)
+        print(f"Data modificada: {data}")
         RESERVAS.append(data)
         date = data["date"]
         return jsonify({"message": f"Se creo una solicitud para el dia {date}"}), 200
     except Exception as e:
         return {'error': str(e)}, 500
 
+# Lista las reservas del provider <provider_id>
 @app.route('/providers/<int:provider_id>/reservas/', methods=['GET'])
 def get_reservas(provider_id):
     try:
@@ -330,7 +333,8 @@ def get_reservas(provider_id):
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/reservas/<string:reserva_id>', methods=['PATCH'])
+# Acepta la reserva <reserva_id>
+@app.route('/providers/reservas/<string:reserva_id>', methods=['PATCH'])
 def accept_reserva(reserva_id):
     reserva = next((reserva for reserva in RESERVAS if reserva["id"] == reserva_id), None)
     if reserva is not None:
@@ -338,6 +342,11 @@ def accept_reserva(reserva_id):
         #enviar notificacion a token
         return jsonify({"message": f"aceptaste la reserva {reserva_id}"}), 200
     return jsonify({'error': f"no se pudo encontrar la reserva con id {reserva_id}"}), 500
+
+# Lista TODAS las reservas de todos los proveedores
+@app.route('/providers/reservas', methods=['GET'])
+def list_reservas():
+    return jsonify({"reservas": RESERVAS}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

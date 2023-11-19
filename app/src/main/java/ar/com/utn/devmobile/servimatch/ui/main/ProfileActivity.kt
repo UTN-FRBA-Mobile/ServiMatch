@@ -214,7 +214,7 @@ fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.nombre}/${persona.precio_visita}/$disponibilidadStr")})
+        Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.id}/${persona.precio_visita}/$disponibilidadStr")})
         Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.id}")})
     }
 }

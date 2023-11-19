@@ -65,20 +65,21 @@ private fun App(sharedViewModel: SharedViewModel = viewModel()) {
         }
 
         composable(
-            route = "booking/{username}/{precio}/{disponibilidad}",
+            route = "booking/{proveedor}/{precio}/{disponibilidad}",
             arguments = listOf(
-                navArgument("username") { type = NavType.StringType },
+                navArgument("proveedor") { type = NavType.StringType },
                 navArgument("precio") { type = NavType.StringType },
                 navArgument("disponibilidad") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
+            val id = backStackEntry.arguments?.getString("proveedor")?: ""
             val precio = backStackEntry.arguments?.getString("precio") ?: ""
             val disponibilidadString  = backStackEntry.arguments?.getString("disponibilidad") ?: ""
             // Convierte la cadena de "disponibilidad" en un array de cadenas
             val disponibilidad = disponibilidadString.split(",").map { it.trim() }
+            val proovedor = id.toInt()
 
-            BookingScreen(navController = navController, sharedViewModel = sharedViewModel , username = username, precioConsulta = precio, disponibilidad = disponibilidad)
+            BookingScreen(navController = navController, sharedViewModel = sharedViewModel , idProveedor = proovedor, precioConsulta = precio, disponibilidad = disponibilidad)
         }
 
         composable(

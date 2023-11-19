@@ -1,7 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 
-import android.app.DatePickerDialog
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -22,8 +21,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,15 +40,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.ReservaRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
-import ar.com.utn.devmobile.servimatch.ui.theme.AzulOscuro
+import retrofit2.http.POST
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -58,8 +56,7 @@ import java.time.format.DateTimeFormatter
 @ExperimentalMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel, username: String, precioConsulta: String, disponibilidad: List<String>) {
-
+fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel, idProveedor: Int, precioConsulta: String, disponibilidad: List<String>) {
     var turnoSelected by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) } // Variable para controlar la visibilidad del AlertDialog
     val dateState = rememberDatePickerState(
@@ -83,9 +80,22 @@ fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel
             // Por ejemplo, imprimir el nuevo turno:
             Log.d("nuevo","Nuevo turno seleccionado: $nuevoTurno")
         })
-        ReservarSection(turnoSelected, dateState, sharedViewModel, precioConsulta, showDialog) { showDialog = true }
+        ReservarSection(precioConsulta) { showDialog = true }
         if (showDialog) {
-            ShowAlertDialog(turnoSelected, dateState, sharedViewModel, precioConsulta) { showDialog = false }
+            var result = false
+            if (turnoSelected != "") {
+                val fecha = millisToDate(dateState.selectedDateMillis)
+                val cliente = sharedViewModel.username.value
+                val request = ReservaRequest(turnoSelected, fecha, cliente, precioConsulta)
+                Log.d("reserva", "ENVIANDO AL BACK")
+                Log.d("Turno reserva", turnoSelected)
+                Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
+                Log.d("Username reserva", sharedViewModel.username.value)
+                Log.d("Precio consulta reserva", precioConsulta)
+                Log.d("Id proveedor reserva", idProveedor.toString())
+                result = sendRequest(request, idProveedor)
+            }
+            ShowAlertDialog(result, turnoSelected) { showDialog = false }
         }
     }
 }
@@ -117,8 +127,12 @@ fun Header(navController: NavController) {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowAlertDialog(turnoSelected: String, dateState: DatePickerState, sharedViewModel: SharedViewModel, precioConsulta: String, toggleDialog: () -> Unit) {
-    val text = if (turnoSelected != "") "Reserva Creada: $turnoSelected" else "Debe seleccionar un turno"
+fun ShowAlertDialog(result: Boolean, turnoSelected: String, toggleDialog: () -> Unit) {
+    val text = when {
+        turnoSelected.isBlank() -> "Debe seleccionar un turno"
+        !result -> "Hubo un error al crear la reserva"
+        else -> "Reserva Creada: $turnoSelected"
+    }
 
     AlertDialog(
         onDismissRequest = {
@@ -215,7 +229,7 @@ fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSel
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservarSection(turnoSelected: String, dateState: DatePickerState, sharedViewModel: SharedViewModel, precioConsulta: String, showDialog: Boolean, onConfirm: () -> Unit) {
+fun ReservarSection(precioConsulta: String, onConfirm: () -> Unit) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -240,13 +254,6 @@ fun ReservarSection(turnoSelected: String, dateState: DatePickerState, sharedVie
                 Button(
                     onClick = {
                         onConfirm()
-                        if (turnoSelected != "") {
-                            Log.d("reserva", "ENVIANDO AL BACK")
-                            Log.d("Turno reserva", turnoSelected)
-                            Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
-                            Log.d("Username reserva", sharedViewModel.username.value)
-                            Log.d("Precio consulta reserva", precioConsulta)
-                        }
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -301,5 +308,20 @@ fun validateDays(timestamp: Long): Boolean {
 
 
     return !(selectedLocalDate.isBefore(yesterday) || selectedLocalDate.isEqual(fiveDaysLater) || selectedLocalDate.isEqual(randomDay))
+}
+
+@Composable
+fun sendRequest(request: ReservaRequest, idProveedor: Int): Boolean {
+    var isRequestSuccessful by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        try {
+            val response = ApiClient.apiService.createReserva(idProveedor, request)
+            isRequestSuccessful = response.isSuccessful
+        } catch(e: Exception) {
+            Log.d("ERROR", "Error al crear reserva: $e")
+            isRequestSuccessful = false
+        }
+    }
+    return isRequestSuccessful
 }
 
