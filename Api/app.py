@@ -1,11 +1,14 @@
 import math
 import uuid
 from flask import jsonify, Flask, request
+from notifier import init_FCM, send_notification
+from usuarios import USERS
 from reservas import RESERVAS
 from dummy_data import PROVIDERS
 
 app = Flask("serviceMatch")
 
+init_FCM()
 
 @app.route('/healthcheck', methods=['GET'])
 def healthcheck():
@@ -58,11 +61,10 @@ def login():
         data = request.get_json()
         username = data['username']
         password = data['password']
-
-        if username == "admin" and password == "admin":
-            return jsonify({'message': 'Login successful'}), 200
-        else:
-            return jsonify({'message': 'Login error'}), 403
+        for user in USERS:
+            if user["username"] == username and user["password"] == password:
+                return jsonify({'message': 'Login successful'}), 200
+        return jsonify({'message': 'Login error'}), 403
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -300,13 +302,47 @@ def getProvidersByCoordinates():
 
 @app.route('/providers/<int:provider_id>', methods=['GET'])
 def provider_profile(provider_id):
-    provider = next((provider for provider in PROVIDERS if provider["id"] == provider_id), None)
+    provider = find_provider(provider_id)
     if provider is not None:
         return jsonify(provider), 200
     return jsonify({'error': f"no se pudo encontrar el proveedor {provider_id}"}), 500
 
 
-"""RUTAS PARA RESERVAS"""
+@app.route('/users/<string:username>', methods=['PATCH'])
+def refreshToken(username):
+    try:
+        data = request.get_json()
+        token = data["token"]
+        print(f"Token recibido: {token}")
+        for user in USERS:
+            if user["username"] == username:
+                user["token"] = token
+                return jsonify({'message': 'Login successful'}), 200
+        return jsonify({'message': 'Login error'}), 403
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/users', methods=['GET'])
+def listUsers():
+    return jsonify({"users": USERS}), 200
+
+
+def find_provider(id):
+    return next((provider for provider in PROVIDERS if provider["id"] == id), None)
+
+def find_user(username):
+    return next((user for user in USERS if user["username"] == username), None)
+
+def enviar_notificacion(username, provider):
+    user = find_user(username)
+    token = user["token"] if user and "token" in user else None
+    provider_name = provider["nombre"]
+    provider_lastname = provider["apellido"]
+    body = f"{provider_name} {provider_lastname} acepto tu reserva.\n Hace click para coordinar la visita!"
+    disponibilidad = ", ".join(provider["disponibilidad"])
+    send_notification(body, provider["id"], provider["precio_visita"], disponibilidad, token)
+
+"""""""""""""""""""""""""""""""""""""""RUTAS PARA RESERVAS"""""""""""""""""""""""""""""""""""""""
 
 # Crea una reserva para el provider <provider_id>
 @app.route('/providers/<int:provider_id>/reservas', methods=['POST'])
@@ -324,8 +360,8 @@ def create_reserva(provider_id):
     except Exception as e:
         return {'error': str(e)}, 500
 
-# Lista las reservas del provider <provider_id>
-@app.route('/providers/<int:provider_id>/reservas/', methods=['GET'])
+# Lista las reservas PENDIENTES del provider <provider_id>
+@app.route('/providers/<int:provider_id>/reservas/pendientes', methods=['GET'])
 def get_reservas(provider_id):
     try:
         reservas_provider = list(filter(lambda reserva: reserva["provider_id"] is provider_id and not reserva["accepted"], RESERVAS))
@@ -333,15 +369,30 @@ def get_reservas(provider_id):
     except Exception as e:
         return {'error': str(e)}, 500
 
+# Lista las reservas ACEPTADAS del provider <provider_id>
+@app.route('/providers/<int:provider_id>/reservas/dates', methods=['GET'])
+def get_accepted_dates(provider_id):
+    try:
+        reservas = list(filter(lambda reserva: reserva["provider_id"] is provider_id and reserva["accepted"], RESERVAS))
+        fechas = [reserva["date"] for reserva in reservas]
+        return jsonify(fechas), 200
+    except Exception as e:
+        return {'error': str(e)}, 500
+
 # Acepta la reserva <reserva_id>
 @app.route('/providers/reservas/<string:reserva_id>', methods=['PATCH'])
 def accept_reserva(reserva_id):
-    reserva = next((reserva for reserva in RESERVAS if reserva["id"] == reserva_id), None)
-    if reserva is not None:
-        reserva["accepted"] = True
-        #enviar notificacion a token
-        return jsonify({"message": f"aceptaste la reserva {reserva_id}"}), 200
-    return jsonify({'error': f"no se pudo encontrar la reserva con id {reserva_id}"}), 500
+    try:
+        reserva = next((reserva for reserva in RESERVAS if reserva["id"] == reserva_id), None)
+        if reserva is not None:
+            username = reserva["username"]
+            provider = find_provider(reserva["provider_id"])
+            enviar_notificacion(username, provider)
+            reserva["accepted"] = True
+            return jsonify({"message": f"aceptaste la reserva de  {username}"}), 200
+        return jsonify({'error': f"no se pudo encontrar la reserva con id {reserva_id}"}), 402
+    except Exception as e:
+        return {'error': str(e)}, 500
 
 # Lista TODAS las reservas de todos los proveedores
 @app.route('/providers/reservas', methods=['GET'])

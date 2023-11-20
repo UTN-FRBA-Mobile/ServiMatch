@@ -4,6 +4,7 @@ import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -15,6 +16,12 @@ interface ApiService {
     suspend fun createReserva(
         @Path("provider_id") providerId: Int,
         @Body loginRequest: ReservaRequest
+    ): Response<JSONObject>
+
+    @PATCH("/users/{username}")
+    suspend fun saveUserToken(
+        @Path("username") username: String,
+        @Body token: TokenRequest
     ): Response<JSONObject>
 
     @GET("/tipoProfesion")
@@ -31,4 +38,9 @@ interface ApiService {
 
     @GET("/providers/")
     suspend fun getProviders(): Response<List<ProviderInfo>>
+
+    @GET("/providers/{provider_id}/reservas/dates")
+    suspend fun getProvidersUnvailableDays(
+        @Path("provider_id") idProveedor: Int
+    ): Response<List<String>>
 }
