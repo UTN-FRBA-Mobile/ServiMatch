@@ -17,28 +17,36 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.R
+import ar.com.utn.devmobile.servimatch.firebase.FCM
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 import ar.com.utn.devmobile.servimatch.ui.model.LoginRequest
+import ar.com.utn.devmobile.servimatch.ui.model.TokenRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import okhttp3.internal.wait
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+fun LoginScreen(navController: NavController) {
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -107,16 +115,14 @@ fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) 
                     isLoading = true
                     isError = false
                     errorMessage = ""
-
                     val loginRequest = LoginRequest(username, password)
 
                     viewModelScope.launch {
                         try {
                             val response = ApiClient.apiService.login(loginRequest)
-
                             if (response.isSuccessful) {
-                                // La solicitud fue exitosa, puedes procesar la respuesta aquí
-                                sharedViewModel.updateUsername(username)
+                                MyPreferences.getInstance().set("username", username)
+                                refreshUserToken()
                                 delay(1000)
                                 navController.navigate(
                                     route = "home/${username}"
@@ -163,4 +169,17 @@ fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) 
     }
 
 }
+
+suspend fun refreshUserToken() {
+    val username = MyPreferences.getInstance().get("username")?:""
+    val token    = MyPreferences.getInstance().get("token")?:""
+    val tokenResponse = ApiClient.apiService.saveUserToken(username, TokenRequest(token))
+    if (tokenResponse.isSuccessful) {
+        Log.d("FCM", "TOKEN: $token")
+    } else {
+        Log.d("FCM", "ERROR AL GUARDAR EL TOKEN LUEGO DE INICIAR SESION")
+    }
+}
+
+
 

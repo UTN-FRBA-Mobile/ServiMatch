@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
@@ -33,31 +34,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
-import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
-import ar.com.utn.devmobile.servimatch.ui.model.ProviderProfile
 import ar.com.utn.devmobile.servimatch.ui.model.ReservaRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import retrofit2.Response
-import retrofit2.http.POST
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -136,7 +128,6 @@ fun Header(navController: NavController) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowAlertDialog(result: Boolean, turnoSelected: String, toggleDialog: () -> Unit) {
     val text = when {
@@ -288,45 +279,33 @@ fun ReservarSection(precioConsulta: String, onConfirm: () -> Unit) {
 @Composable
 fun CustomDatePicker(dateState: DatePickerState, idProveedor: Int){
     var fechas by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         MainScope().launch {
             val response = ApiClient.apiService.getProvidersUnvailableDays(idProveedor)
             if (response.isSuccessful) {
                 fechas = response.body()?:emptyList()
+                isLoading = false
             } else {
                 Log.d("FECHAS", "Error al hacer la peticion de las fechas")
             }
         }
     }
 
-    /*val validateDays: (Long, List<String>) -> Boolean = { timestamp, _fechas ->
-        val today = LocalDate.now()
-        val selectedLocalDate = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate()
-
-        if (_fechas.isEmpty()) {
-            Log.d("FECHAS", "La lista de fechas esta vacia: $_fechas")
-             !(selectedLocalDate.isBefore(today))
-        } else {
-            Log.d("FECHAS", "La fechas contiene elementos $_fechas")
-            val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-            val fechasFormateadas: List<LocalDate> = _fechas.map { LocalDate.parse(it, formatter) }
-            !(selectedLocalDate.isBefore(today) || fechasFormateadas.contains(selectedLocalDate))
+    if (isLoading) {
+        Row(
+            modifier = Modifier.fillMaxWidth().offset(y = (-35).dp).zIndex(-1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircularProgressIndicator()
         }
-    }*/
-
-    Log.d("FECHAS", "La fechas ANTES de DatePicker $fechas")
-
-    if (fechas.isNotEmpty()) {
+    } else {
         DatePicker(
             state = dateState,
-            //dateValidator = { timestamp -> validateDays(timestamp, fechas) }
             dateValidator = { timestamp -> validateDays(timestamp, fechas) }
         )
-    } else {
-        Text("Cargando fechas...")
     }
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -341,7 +320,7 @@ fun validateDays(timestamp: Long, fechas: List<String>): Boolean {
         return !(selectedLocalDate.isBefore(today))
     }
 
-    Log.d("FECHAS", "La fechas contiene elementos $fechas")
+    Log.d("FECHAS", "$fechas")
     val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
     val fechasFormateadas: List<LocalDate> = fechas.map { LocalDate.parse(it, formatter) }
 
