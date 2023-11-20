@@ -1,4 +1,4 @@
-package ar.com.utn.devmobile.servimatch.ui.firebase
+package ar.com.utn.devmobile.servimatch.firebase
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

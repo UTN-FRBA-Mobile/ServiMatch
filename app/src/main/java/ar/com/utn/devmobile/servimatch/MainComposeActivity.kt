@@ -6,18 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import androidx.navigation.navArgument
-import ar.com.utn.devmobile.servimatch.ui.firebase.FCM
+import ar.com.utn.devmobile.servimatch.firebase.FCM
 import ar.com.utn.devmobile.servimatch.ui.main.BookingScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ContactMe
 import ar.com.utn.devmobile.servimatch.ui.main.HomeScreen
@@ -29,6 +26,7 @@ class MainComposeActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FCM().saveTokenInPreferences()
         setContent {
             var destinationRoute = "login"
             if(intent.hasExtra("destination")) {
@@ -44,7 +42,6 @@ class MainComposeActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun App(destinationRoute: String) {
-    FCM().saveTokenInPreferences()
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = destinationRoute) {
         composable("login") {
