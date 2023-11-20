@@ -1,4 +1,4 @@
-package ar.com.utn.devmobile.servimatch.ui.firebase
+package ar.com.utn.devmobile.servimatch.firebase
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,61 +8,62 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationCompat
 import ar.com.utn.devmobile.servimatch.MainComposeActivity
+import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.R
-import ar.com.utn.devmobile.servimatch.ui.main.SharedViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class FCM : FirebaseMessagingService() {
-    fun saveToken() {
+    fun saveTokenInPreferences() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val token = task.result?.token
-                Log.d("FCM", "EL TOKEN DE 'saveToken' es $token")
-                SharedViewModel().updateToken(token)
+                val token = task.result
+                if (token != null) {
+                    MyPreferences.getInstance().set("token", token)
+                } else {
+                    Log.w("FCM", "El token es nulo")
+                }
             } else {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                Log.w("FCM", "Error al obtener el token", task.exception)
             }
         }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        var route = ""
         Log.d("FCM", "Llega un mensaje")
         if (remoteMessage.data.isNotEmpty()) {
-            val idProveedor = remoteMessage.data["provider_id"]
+            val idProveedor = remoteMessage.data["id_proveedor"]
+            route = "contactMe/$idProveedor"
+            Log.d("FCM", "RUTA: $route")
             Log.d("FCM", "ID del Proovedor: $idProveedor")
         }
         remoteMessage.notification?.let {
             val title = it.title
             val body = it.body
             Log.d("FCM", "Titulo: $title, Cuerpo: $body")
-            showNotification(it)
+            showNotification(it, route)
         }
     }
 
     override fun onNewToken(newToken: String) {
         Log.d("FCM", newToken)
-        SharedViewModel().updateToken(newToken)
+        MyPreferences.getInstance().set("token", newToken)
         super.onNewToken(newToken)
     }
 
-    private fun showNotification(notification: RemoteMessage.Notification) {
+    private fun showNotification(notification: RemoteMessage.Notification, route: String) {
         val intent = Intent(this, MainComposeActivity::class.java)
-
+        if (route != "") {
+            intent.putExtra("destination", route)
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-
         val requestCode = 0
-
         val pendingIntent = PendingIntent.getActivity(this, requestCode, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.img)
@@ -71,9 +72,7 @@ class FCM : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
-
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -81,7 +80,6 @@ class FCM : FirebaseMessagingService() {
                 NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
-
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
