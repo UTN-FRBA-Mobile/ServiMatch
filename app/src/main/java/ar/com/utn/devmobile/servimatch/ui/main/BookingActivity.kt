@@ -33,19 +33,30 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderProfile
 import ar.com.utn.devmobile.servimatch.ui.model.ReservaRequest
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 import retrofit2.http.POST
 import java.time.Instant
 import java.time.LocalDate
@@ -56,7 +67,7 @@ import java.time.format.DateTimeFormatter
 @ExperimentalMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel, idProveedor: Int, precioConsulta: String, disponibilidad: List<String>) {
+fun BookingScreen(navController: NavController, idProveedor: Int, precioConsulta: String, disponibilidad: List<String>) {
     var turnoSelected by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) } // Variable para controlar la visibilidad del AlertDialog
     val dateState = rememberDatePickerState(
@@ -73,7 +84,7 @@ fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(navController)
-        DatePickerSection(dateState)
+        DatePickerSection(dateState, idProveedor)
         TurnoSection(turnoSelected, disponibilidad, onTurnoSelected = { nuevoTurno ->
             turnoSelected = nuevoTurno
             // Aquí puedes realizar cualquier acción adicional que necesites después de seleccionar un nuevo turno
@@ -85,12 +96,12 @@ fun BookingScreen(navController: NavController, sharedViewModel: SharedViewModel
             var result = false
             if (turnoSelected != "") {
                 val fecha = millisToDate(dateState.selectedDateMillis)
-                val cliente = sharedViewModel.username.value
+                val cliente = MyPreferences.getInstance().get("username")?:""
                 val request = ReservaRequest(turnoSelected, fecha, cliente, precioConsulta)
                 Log.d("reserva", "ENVIANDO AL BACK")
                 Log.d("Turno reserva", turnoSelected)
                 Log.d("Fecha reserva", millisToDate(dateState.selectedDateMillis))
-                Log.d("Username reserva", sharedViewModel.username.value)
+                Log.d("Username reserva", cliente)
                 Log.d("Precio consulta reserva", precioConsulta)
                 Log.d("Id proveedor reserva", idProveedor.toString())
                 result = sendRequest(request, idProveedor)
@@ -166,7 +177,7 @@ fun ShowAlertDialog(result: Boolean, turnoSelected: String, toggleDialog: () -> 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePickerSection(dateState: DatePickerState) {
+fun DatePickerSection(dateState: DatePickerState, idProveedor: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,9 +185,10 @@ fun DatePickerSection(dateState: DatePickerState) {
             .zIndex(-1f),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CustomDatePicker(dateState)
+        CustomDatePicker(dateState, idProveedor)
     }
 }
+
 
 @Composable
 fun TurnoSection(turnoSelected: String, disponibilidad: List<String>, onTurnoSelected: (String) -> Unit) {
@@ -274,14 +286,66 @@ fun ReservarSection(precioConsulta: String, onConfirm: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CustomDatePicker(dateState: DatePickerState){
-    DatePicker(
-		state = dateState,
-        dateValidator = { timestamp -> validateDays(timestamp) }
-        //dateValidator = { timestamp ->
-        //    timestamp > LocalDate.now().minusDays(1).toMillis() || timestamp == LocalDate.now().plusDays(5).toMillis()
-        //}
-	)
+fun CustomDatePicker(dateState: DatePickerState, idProveedor: Int){
+    var fechas by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        MainScope().launch {
+            val response = ApiClient.apiService.getProvidersUnvailableDays(idProveedor)
+            if (response.isSuccessful) {
+                fechas = response.body()?:emptyList()
+            } else {
+                Log.d("FECHAS", "Error al hacer la peticion de las fechas")
+            }
+        }
+    }
+
+    /*val validateDays: (Long, List<String>) -> Boolean = { timestamp, _fechas ->
+        val today = LocalDate.now()
+        val selectedLocalDate = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate()
+
+        if (_fechas.isEmpty()) {
+            Log.d("FECHAS", "La lista de fechas esta vacia: $_fechas")
+             !(selectedLocalDate.isBefore(today))
+        } else {
+            Log.d("FECHAS", "La fechas contiene elementos $_fechas")
+            val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+            val fechasFormateadas: List<LocalDate> = _fechas.map { LocalDate.parse(it, formatter) }
+            !(selectedLocalDate.isBefore(today) || fechasFormateadas.contains(selectedLocalDate))
+        }
+    }*/
+
+    Log.d("FECHAS", "La fechas ANTES de DatePicker $fechas")
+
+    if (fechas.isNotEmpty()) {
+        DatePicker(
+            state = dateState,
+            //dateValidator = { timestamp -> validateDays(timestamp, fechas) }
+            dateValidator = { timestamp -> validateDays(timestamp, fechas) }
+        )
+    } else {
+        Text("Cargando fechas...")
+    }
+
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun validateDays(timestamp: Long, fechas: List<String>): Boolean {
+    val today = LocalDate.now()
+    val selectedLocalDate = Instant.ofEpochMilli(timestamp)
+        .atZone(ZoneOffset.UTC)
+        .toLocalDate()
+
+    if (fechas.isEmpty()) {
+        Log.d("FECHAS", "La lista de fechas esta vacia: $fechas")
+        return !(selectedLocalDate.isBefore(today))
+    }
+
+    Log.d("FECHAS", "La fechas contiene elementos $fechas")
+    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+    val fechasFormateadas: List<LocalDate> = fechas.map { LocalDate.parse(it, formatter) }
+
+    return !(selectedLocalDate.isBefore(today) || fechasFormateadas.contains(selectedLocalDate))
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -293,21 +357,6 @@ fun millisToDate(millis: Long?): String {
     } ?: run {
         return "Fecha no seleccionada"
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun validateDays(timestamp: Long): Boolean {
-    val currentDate = LocalDate.now()
-    val yesterday = currentDate.minusDays(1)
-    val fiveDaysLater = currentDate.plusDays(5)
-    val randomDay = LocalDate.of(2023, 12, 15)
-
-    val selectedLocalDate = Instant.ofEpochMilli(timestamp)
-        .atZone(ZoneOffset.UTC)
-        .toLocalDate()
-
-
-    return !(selectedLocalDate.isBefore(yesterday) || selectedLocalDate.isEqual(fiveDaysLater) || selectedLocalDate.isEqual(randomDay))
 }
 
 @Composable
