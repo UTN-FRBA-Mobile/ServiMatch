@@ -53,13 +53,10 @@ fun ContactMe(navController: NavController, idProvider: String) {
     LaunchedEffect(Unit) {
         idProvider.let { providerId ->
             try {
-                Log.d("CONTACT", "ID antes de ser inteado: $idProvider")
                 val intedID = Integer.parseInt(providerId)
-                Log.d("CONTACT", "ID luego de ser inteado: $intedID")
                 val response = ApiClient.apiService.getProviderContacts(intedID)
                 if (response.isSuccessful) {
                     providerContacts = response.body()
-                    Log.d("CONTACT", "Response: $providerContacts")
                     isLoading = false
                 } else {
                     Log.d("ERROR", "No se pudo obtener el proveedor con id $providerId")

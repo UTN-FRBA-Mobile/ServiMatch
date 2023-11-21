@@ -38,11 +38,9 @@ class MainComposeActivity : ComponentActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
-        Log.d("INIT_ROUTE", "ENTRO AL onNewIntent")
         super.onNewIntent(intent)
         val destination = intent.getStringExtra("destination")
         if (destination != null) {
-            Log.d("INIT_ROUTE", destination)
             navController.navigate(destination)
         }
     }
@@ -102,7 +100,6 @@ private fun App() {
             arguments = listOf(navArgument("providerId") { type = NavType.StringType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("providerId") ?: ""
-            Log.d("CONTACT", "ID en string: $id")
             ContactMe(navController = navController, idProvider = id)
         }
     }

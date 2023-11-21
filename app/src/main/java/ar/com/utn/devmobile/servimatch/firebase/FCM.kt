@@ -35,7 +35,7 @@ class FCM : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         var idProvider = ""
-        Log.d("FCM", "Llega un mensaje")
+        Log.d("FCM", "Llego un mensaje")
         if (remoteMessage.data.isNotEmpty()) {
             idProvider = remoteMessage.data["id_proveedor"]?:""
             Log.d("FCM", "ID_PROVEEDOR $idProvider")
@@ -85,38 +85,6 @@ class FCM : FirebaseMessagingService() {
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
-/*
-    private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
-        val intent = Intent(this, MainComposeActivity::class.java).apply {
-            putExtra("destination", "contactMe/${idProvider}")
-        }
-        Log.d("INITIAL_ROUTE", "En ShowNotification: $idProvider")
-        /*if (route != "") {
-            intent.putExtra("destination", route)
-        }*/
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val requestCode = 0
-        val pendingIntent = PendingIntent.getActivity(this, requestCode, intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.img)
-            .setContentTitle(notification.title)
-            .setContentText(notification.body)
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-        val notificationId = 0
-        notificationManager.notify(notificationId, notificationBuilder.build())
-    }*/
 
     companion object {
         private val CHANNEL_ID = "CHANNEL_1"
