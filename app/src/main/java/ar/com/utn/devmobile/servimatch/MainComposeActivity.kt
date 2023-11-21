@@ -1,6 +1,7 @@
 package ar.com.utn.devmobile.servimatch
 
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,8 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,18 +25,25 @@ import ar.com.utn.devmobile.servimatch.ui.main.LoginScreen
 import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
 import ar.com.utn.devmobile.servimatch.ui.main.MapScreen
 
+
+
 class MainComposeActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FCM().saveTokenInPreferences()
         setContent {
-            var destinationRoute = "login"
-            if(intent.hasExtra("destination")) {
-                destinationRoute = intent.getStringExtra("destination") ?: "login"
-            }
-            Log.d("INITIAL_ROUTE", destinationRoute)
-            App(destinationRoute)
+            App()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        Log.d("INIT_ROUTE", "ENTRO AL onNewIntent")
+        super.onNewIntent(intent)
+        val destination = intent.getStringExtra("destination")
+        if (destination != null) {
+            Log.d("INIT_ROUTE", destination)
+            navController.navigate(destination)
         }
     }
 }
@@ -41,11 +51,10 @@ class MainComposeActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun App(destinationRoute: String) {
-    Log.d("INITIAL_ROUTE", "EN APP: $destinationRoute")
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = destinationRoute) {
-        Log.d("INITIAL_ROUTE", "EN NAVHOST: $destinationRoute")
+private fun App() {
+    navController = rememberNavController()
+    NavHost(navController = navController as NavHostController, startDestination = "login") {
+
         composable("login") {
             LoginScreen(navController = navController)
         }
@@ -98,3 +107,5 @@ private fun App(destinationRoute: String) {
         }
     }
 }
+
+lateinit var navController: NavController

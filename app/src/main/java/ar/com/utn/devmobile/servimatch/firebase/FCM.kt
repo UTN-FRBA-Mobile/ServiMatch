@@ -57,6 +57,7 @@ class FCM : FirebaseMessagingService() {
     private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
         val intent = Intent(this, MainComposeActivity::class.java).apply {
             putExtra("destination", "contactMe/${idProvider}")
+            Log.d("INIT_ROUTE", "En FCM es: \"contactMe/${idProvider}\"")
         }
         val requestCode = idProvider.toInt()
         val pendingIntent = PendingIntent.getActivity(
@@ -84,8 +85,8 @@ class FCM : FirebaseMessagingService() {
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
-
-    /*private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
+/*
+    private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
         val intent = Intent(this, MainComposeActivity::class.java).apply {
             putExtra("destination", "contactMe/${idProvider}")
         }
