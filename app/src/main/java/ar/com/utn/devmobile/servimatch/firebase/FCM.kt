@@ -34,19 +34,17 @@ class FCM : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        var ruta = ""
+        var idProvider = ""
         Log.d("FCM", "Llega un mensaje")
         if (remoteMessage.data.isNotEmpty()) {
-            val idProveedor = remoteMessage.data["id_proveedor"]
-            Log.d("FCM", "ID_PROVEEDOR $idProveedor")
-            ruta = "contactMe/$idProveedor"
+            idProvider = remoteMessage.data["id_proveedor"]?:""
+            Log.d("FCM", "ID_PROVEEDOR $idProvider")
         }
         remoteMessage.notification?.let {
             val title = it.title
             val body = it.body
             Log.d("FCM", "Titulo: $title, Cuerpo: $body")
-            Log.d("INITIAL_ROUTE", "En FCM: $ruta")
-            showNotification(it, ruta)
+            showNotification(it, idProvider)
         }
     }
 
@@ -56,13 +54,46 @@ class FCM : FirebaseMessagingService() {
         super.onNewToken(newToken)
     }
 
-    private fun showNotification(notification: RemoteMessage.Notification, route: String) {
-        val intent = Intent(this, MainComposeActivity::class.java)
-        Log.d("INITIAL_ROUTE", "En ShowNotification: $route")
-        if (route != "") {
-            intent.putExtra("destination", route)
+    private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
+        val intent = Intent(this, MainComposeActivity::class.java).apply {
+            putExtra("destination", "contactMe/${idProvider}")
         }
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val requestCode = idProvider.toInt()
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.img)
+            .setContentTitle(notification.title)
+            .setContentText(notification.body)
+            .setAutoCancel(true) .setSound(defaultSoundUri)
+            .setContentIntent(pendingIntent)
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+        val notificationId = 0
+        notificationManager.notify(notificationId, notificationBuilder.build())
+    }
+
+    /*private fun showNotification(notification: RemoteMessage.Notification, idProvider: String) {
+        val intent = Intent(this, MainComposeActivity::class.java).apply {
+            putExtra("destination", "contactMe/${idProvider}")
+        }
+        Log.d("INITIAL_ROUTE", "En ShowNotification: $idProvider")
+        /*if (route != "") {
+            intent.putExtra("destination", route)
+        }*/
+        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val requestCode = 0
         val pendingIntent = PendingIntent.getActivity(this, requestCode, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
@@ -84,7 +115,7 @@ class FCM : FirebaseMessagingService() {
         }
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
-    }
+    }*/
 
     companion object {
         private val CHANNEL_ID = "CHANNEL_1"

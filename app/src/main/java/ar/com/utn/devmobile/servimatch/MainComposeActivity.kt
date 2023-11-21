@@ -42,8 +42,10 @@ class MainComposeActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun App(destinationRoute: String) {
+    Log.d("INITIAL_ROUTE", "EN APP: $destinationRoute")
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = destinationRoute) {
+        Log.d("INITIAL_ROUTE", "EN NAVHOST: $destinationRoute")
         composable("login") {
             LoginScreen(navController = navController)
         }
@@ -88,8 +90,11 @@ private fun App(destinationRoute: String) {
 
         composable(
             route = "contactMe/{providerId}",
-        ) {
-            ContactMe(navController = navController)
+            arguments = listOf(navArgument("providerId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("providerId") ?: ""
+            Log.d("CONTACT", "ID en string: $id")
+            ContactMe(navController = navController, idProvider = id)
         }
     }
 }

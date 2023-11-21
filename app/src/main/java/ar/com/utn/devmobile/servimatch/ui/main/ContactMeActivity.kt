@@ -34,6 +34,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import coil.compose.AsyncImage
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,23 +46,34 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ContactMe(navController: NavController) {
-    var providerContacts by remember { mutableStateOf<ProviderContacts?>(CONTACTOS_MOCKEADOS) }
-    val arguments = navController.currentBackStackEntry?.arguments
-    val id = arguments?.getString("providerId")?.toInt()
+fun ContactMe(navController: NavController, idProvider: String) {
+    var providerContacts by remember { mutableStateOf<ProviderContacts?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        val response = id?.let { ApiClient.apiService.getProviderContacts(it) }
-
-        if (response != null) {
-            providerContacts = if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.d("ERROR", "No se pudo obtener el proveedor con id $id")
-                CONTACTOS_MOCKEADOS
+        idProvider.let { providerId ->
+            try {
+                Log.d("CONTACT", "ID antes de ser inteado: $idProvider")
+                val intedID = Integer.parseInt(providerId)
+                Log.d("CONTACT", "ID luego de ser inteado: $intedID")
+                val response = ApiClient.apiService.getProviderContacts(intedID)
+                if (response.isSuccessful) {
+                    providerContacts = response.body()
+                    Log.d("CONTACT", "Response: $providerContacts")
+                    isLoading = false
+                } else {
+                    Log.d("ERROR", "No se pudo obtener el proveedor con id $providerId")
+                    providerContacts = CONTACTOS_MOCKEADOS
+                    isLoading = false
+                }
+            } catch (e: Exception) {
+                Log.e("ERROR", "Error al obtener el proveedor con id $providerId", e)
+                providerContacts = CONTACTOS_MOCKEADOS
+                isLoading = false
             }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,8 +82,12 @@ fun ContactMe(navController: NavController) {
         verticalArrangement = Arrangement.Top
     )
     {
-        Header(navController)
-        providerContacts?.let { Body(it) }
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Header(navController)
+            providerContacts?.let { Body(it) }
+        }
     }
 }
 
@@ -185,5 +201,5 @@ val CONTACTOS_MOCKEADOS = ProviderContacts(
 @Composable
 fun PreviewContactMe() {
     val navController = rememberNavController()
-    ContactMe(navController = navController)
+    ContactMe(navController = navController, idProvider = "2")
 }
