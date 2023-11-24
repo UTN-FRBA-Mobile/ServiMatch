@@ -1,19 +1,15 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
-import android.R
-import android.graphics.drawable.Icon
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -32,15 +28,13 @@ import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.ui.model.Contacts
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderContacts
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
-import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -52,23 +46,31 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ContactMe(navController: NavController) {
-    var providerContacts by remember { mutableStateOf<ProviderContacts?>(CONTACTOS_MOCKEADOS) }
-    val arguments = navController.currentBackStackEntry?.arguments
-    val id = arguments?.getString("providerId")?.toInt()
+fun ContactMe(navController: NavController, idProvider: String) {
+    var providerContacts by remember { mutableStateOf<ProviderContacts?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        val response = id?.let { ApiClient.apiService.getProviderContacts(it) }
-
-        if (response != null) {
-            providerContacts = if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.d("ERROR", "No se pudo obtener el proveedor con id $id")
-                CONTACTOS_MOCKEADOS
+        idProvider.let { providerId ->
+            try {
+                val intedID = Integer.parseInt(providerId)
+                val response = ApiClient.apiService.getProviderContacts(intedID)
+                if (response.isSuccessful) {
+                    providerContacts = response.body()
+                    isLoading = false
+                } else {
+                    Log.d("ERROR", "No se pudo obtener el proveedor con id $providerId")
+                    providerContacts = CONTACTOS_MOCKEADOS
+                    isLoading = false
+                }
+            } catch (e: Exception) {
+                Log.e("ERROR", "Error al obtener el proveedor con id $providerId", e)
+                providerContacts = CONTACTOS_MOCKEADOS
+                isLoading = false
             }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,8 +79,12 @@ fun ContactMe(navController: NavController) {
         verticalArrangement = Arrangement.Top
     )
     {
-        Header(navController)
-        providerContacts?.let { Body(it) }
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Header(navController)
+            providerContacts?.let { Body(it) }
+        }
     }
 }
 
@@ -192,5 +198,5 @@ val CONTACTOS_MOCKEADOS = ProviderContacts(
 @Composable
 fun PreviewContactMe() {
     val navController = rememberNavController()
-    ContactMe(navController = navController)
+    ContactMe(navController = navController, idProvider = "2")
 }
