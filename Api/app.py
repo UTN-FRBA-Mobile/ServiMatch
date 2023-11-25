@@ -348,7 +348,7 @@ def enviar_notificacion(username, provider):
     token = user["token"] if user and "token" in user else None
     provider_name = provider["nombre"]
     provider_lastname = provider["apellido"]
-    body = f"{provider_name} {provider_lastname} acepto tu reserva.\n Hace click para coordinar la visita!"
+    body = f"{provider_name} {provider_lastname} acepto tu reserva.\nHace click para coordinar la visita!"
     disponibilidad = ", ".join(provider["disponibilidad"])
     send_notification(body, provider["id"], provider["precio_visita"], disponibilidad, token)
 
