@@ -25,5 +25,8 @@ data class ProviderInfo(
     val rol: String,
 
     @SerializedName("recomendado")
-    val isRecommended: Boolean
+    val isRecommended: Boolean,
+
+    @SerializedName("puntaje")
+    val puntaje: Float
 )

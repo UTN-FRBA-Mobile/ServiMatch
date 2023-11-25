@@ -35,6 +35,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
@@ -50,10 +53,12 @@ import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
+import kotlin.math.roundToInt
 
 
 var paddingH = 16.dp
@@ -239,7 +244,7 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     var rating by remember { mutableStateOf(emptyList<String>()) }
     var filtersApplied by remember { mutableStateOf(false) } // Variable para controlar el get lista filtrada.
     var profesionSeleccionada by remember { mutableStateOf("") } //guarda la profesion seleccionada del dropdown
-    var puntajeSeleccionado by remember { mutableStateOf("") } //guarda el puntaje selecionado del dropdown
+    var puntajeSeleccionado by remember { mutableStateOf("-1") } //guarda el puntaje selecionado del dropdown
     var result by remember { mutableStateOf<List<ProviderInfo>>(mutableListOf())}
 
 
@@ -285,9 +290,12 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     }
     if (filtersApplied) {
         val listaConcatenada = listaProveedores.recomendados.value + listaProveedores.general.value
-        listaProveedores.busqueda.value = buscarPorFiltro(listaConcatenada, profesionSeleccionada, puntajeSeleccionado)
-        filtersApplied = false
-
+        listaProveedores.busqueda.value = buscarPorFiltro(listaConcatenada, profesionSeleccionada, puntajeSeleccionado.toFloat())
+        if(listaProveedores.busqueda.value.isEmpty()){
+            EmptySearch(){filtersApplied = false}
+        }else{
+            filtersApplied = false
+        }
     }
 
 
@@ -422,14 +430,54 @@ fun ShowHomePreview() {
 fun buscarPorFiltro(
     listaProveedores: List<ProviderInfo>,
     profesion: String,
-    puntaje: String
+    puntaje: Float
 ): MutableList<ProviderInfo> {
-    // Filtrar la lista de proveedores para obtener solo aquellos con la profesión deseada
-    val proveedoresFiltrados = listaProveedores.filter { it.rol == profesion }
+    // Verificar si se debe aplicar el filtro de profesión
+    val proveedoresFiltradosPorProfesion = if (profesion.isNotBlank()) {
+        listaProveedores.filter { it.rol == profesion }
+    } else {
+        listaProveedores
+    }
+
+    // Verificar si se debe aplicar el filtro de puntaje
+    val proveedoresFiltradosPorPuntaje = if (puntaje > -1) {
+        proveedoresFiltradosPorProfesion.filter  { it.puntaje.roundToInt() == puntaje.roundToInt()  }
+    } else {
+        proveedoresFiltradosPorProfesion
+    }
 
     // Log de las profesiones de los proveedores filtrados
-        Log.d("ProfesionProveedorFiltrado", proveedoresFiltrados.toString())
+    Log.d("ProfesionPuntajeProveedorFiltrado", proveedoresFiltradosPorPuntaje.toString())
 
     // Devolver la lista de proveedores filtrados
-    return proveedoresFiltrados.toMutableList()
+    return proveedoresFiltradosPorPuntaje.toMutableList()
+}
+@Composable
+fun EmptySearch(function: () -> Unit) {
+    val text = "No hay resultados para esa búsqueda"
+
+    AlertDialog(
+        onDismissRequest = function,
+        title = {
+            Text(text)
+        },
+        confirmButton = {
+            Button(
+                onClick = function,
+                enabled = true,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Turquesa3,
+                    contentColor = Color.White,
+                    disabledContainerColor = Turquesa2,
+                    disabledContentColor = Turquesa3
+                )
+            ) {
+                Text("Aceptar")
+            }
+        },
+        modifier = Modifier
+            .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
+            .background(MaterialTheme.colorScheme.background) // Fondo blanco
+            .clip(RoundedCornerShape(0.dp)) // Establecer esquinas rectangulares
+    )
 }

@@ -8,6 +8,7 @@ PROVIDERS = [
         "precio_visita":"7000",
         "cant_signos_pesos": 5,
         "recomendado": True,
+        "puntaje":4.2,
         "disponibilidad":[
             "Mañana",
             "Tarde"
@@ -60,6 +61,7 @@ PROVIDERS = [
         "image_path": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9QHgAj0iyMyi5GH0zG2qgdn_iNRCv8Qjp3w&usqp=CAU",
         "nombre": "Maria",
         "apellido": "Lopez",
+        "puntaje":4.2,
         "profesion": "Plomero",
         "precio_visita":"5300",
         "cant_signos_pesos": 4,
@@ -116,6 +118,7 @@ PROVIDERS = [
         "nombre": "Carlos",
         "apellido": "Martinez",
         "profesion": "Carpintero",
+        "puntaje":4.3,
         "cant_signos_pesos": 3,
         "precio_visita":"4000",
         "recomendado": False,
@@ -172,6 +175,7 @@ PROVIDERS = [
         "apellido": "Gómez",
         "profesion": "Albañil",
         "cant_signos_pesos": 4,
+        "puntaje":4.7,
         "precio_visita":"4400",
         "recomendado": False,
         "disponibilidad":[
@@ -212,6 +216,7 @@ PROVIDERS = [
         "nombre": "Marcos",
         "apellido": "Rodríguez",
         "profesion": "Mecánico",
+        "puntaje":3.9,
         "cant_signos_pesos": 5,
         "precio_visita":"7000",
         "recomendado": False,
@@ -254,6 +259,7 @@ PROVIDERS = [
         "apellido": "Martínez",
         "profesion": "Jardinero",
         "recomendado": False,
+        "puntaje":3.9,
         "cant_signos_pesos": 2,
         "precio_visita":"2000",
         "disponibilidad":[
@@ -295,6 +301,7 @@ PROVIDERS = [
         "nombre": "Melisa",
         "apellido": "Perez",
         "profesion": "Costurera",
+        "puntaje":4.5,
         "cant_signos_pesos": 4,
         "precio_visita":"3900",
         "recomendado": True,
