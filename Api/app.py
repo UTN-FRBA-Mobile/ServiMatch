@@ -309,7 +309,7 @@ def provider_profile(provider_id):
 
 
 @app.route('/users/<string:username>', methods=['PATCH'])
-def refreshToken(username):
+def getUser(username):
     try:
         data = request.get_json()
         token = data["token"]
@@ -318,6 +318,16 @@ def refreshToken(username):
             if user["username"] == username:
                 user["token"] = token
                 return jsonify({'message': 'Login successful'}), 200
+        return jsonify({'message': 'Login error'}), 403
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/users/<string:username>', methods=['GET'])
+def refreshToken(username):
+    try:
+        for user in USERS:
+            if user["username"] == username:
+                return jsonify(user), 200
         return jsonify({'message': 'Login error'}), 403
     except Exception as e:
         return {'error': str(e)}, 500

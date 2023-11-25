@@ -26,9 +26,8 @@ import ar.com.utn.devmobile.servimatch.ui.main.ProfileScreen
 import ar.com.utn.devmobile.servimatch.ui.main.MapScreen
 
 
-
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class MainComposeActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FCM().saveTokenInPreferences()
@@ -46,8 +45,8 @@ class MainComposeActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun App() {
     navController = rememberNavController()
@@ -57,9 +56,7 @@ private fun App() {
             LoginScreen(navController = navController)
         }
 
-        composable(
-            route = "map"
-        ) {
+        composable(route = "map") {
             MapScreen(navController = navController)
         }
 
