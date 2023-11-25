@@ -1,6 +1,8 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
+import android.location.LocationListener
+import android.location.LocationManager
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -71,7 +73,8 @@ fun HomeScreen(navController: NavController, username: String) {
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
-        listaDeProveedores.getProvedores()
+        //la longitud y latitud esta hardcodeada
+        listaDeProveedores.getProvedores(-34.608550,-58.427796)
     }
         Column(
             modifier = Modifier

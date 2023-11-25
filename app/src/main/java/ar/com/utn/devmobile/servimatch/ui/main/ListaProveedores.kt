@@ -34,10 +34,10 @@ class ListaDeProveedores : ViewModel() {
     val filtrosAplicados = mutableListOf<FiltroAplicado>()
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
-    suspend fun getProvedores(){
+    suspend fun getProvedores(latitud:Double, longitud: Double){
         try {
 
-            val response = ApiClient.apiService.getProviders()
+            val response = ApiClient.apiService.getProvidersByCoordinates(latitud,longitud)
             val providers = response.body()
             providers.safeAccess{ providersInfo ->
                 recomendados.value = providersInfo.filter { it -> it.isRecommended }.toMutableList()
