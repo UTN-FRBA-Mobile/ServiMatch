@@ -360,6 +360,7 @@ def create_reserva(provider_id):
     except Exception as e:
         return {'error': str(e)}, 500
 
+
 # Lista las reservas PENDIENTES del provider <provider_id>
 @app.route('/providers/<int:provider_id>/reservas/pendientes', methods=['GET'])
 def get_reservas(provider_id):

@@ -41,9 +41,14 @@ interface ApiService {
     suspend fun getProviders(): Response<List<ProviderInfo>>
 
     @GET("/providersByCoordinates")
-    suspend fun getProvidersByCoordinates(@Query("latitud") latitud:Double, @Query("longitud") longitud:Double): Response<List<ProviderInfo>>
+    suspend fun getProvidersByCoordinates(
+        @Query("latitud") latitud:Double,
+        @Query("longitud") longitud:Double
+    ): Response<List<ProviderInfo>>
+
     @GET("/providers/{provider_id}/reservas/dates")
     suspend fun getProvidersUnvailableDays(
         @Path("provider_id") idProveedor: Int
     ): Response<List<String>>
+
 }

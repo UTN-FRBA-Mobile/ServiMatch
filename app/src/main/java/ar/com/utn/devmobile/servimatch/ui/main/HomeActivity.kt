@@ -1,11 +1,8 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.annotation.SuppressLint
-import android.location.LocationListener
-import android.location.LocationManager
 import android.util.Log
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,7 +37,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
@@ -50,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
@@ -86,8 +83,6 @@ fun HomeScreen(navController: NavController, username: String) {
         {
 
                 Spacer(modifier = Modifier.height(0.dp))
-
-
                 //Renderizo header.
                 Header(navController, username, 0.dp, 0.dp)
 
@@ -117,7 +112,6 @@ fun HomeScreen(navController: NavController, username: String) {
 
 @Composable
 fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveedores) {
-    val context = LocalContext.current
     val busqueda by remember { listaProveedores.busqueda }
 
     LazyColumn(
@@ -135,7 +129,6 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(busqueda) { providerInfo ->
-
                     Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
@@ -244,6 +237,11 @@ fun Provider(image: String,
 fun FilterList(listaProveedores: ListaDeProveedores) {
     var jobs by remember { mutableStateOf(emptyList<String>()) }
     var rating by remember { mutableStateOf(emptyList<String>()) }
+    var filtersApplied by remember { mutableStateOf(false) } // Variable para controlar el get lista filtrada.
+    var profesionSeleccionada by remember { mutableStateOf("") } //guarda la profesion seleccionada del dropdown
+    var puntajeSeleccionado by remember { mutableStateOf("") } //guarda el puntaje selecionado del dropdown
+    var result by remember { mutableStateOf<List<ProviderInfo>>(mutableListOf())}
+
 
     LaunchedEffect(Unit) {
         try {
@@ -254,10 +252,12 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             Log.d("ERROR", e.toString())
         }
     }
+
     LaunchedEffect(Unit) {
         jobs= ApiClient.apiService.profesiones()
         rating= ApiClient.apiService.rating()
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -269,7 +269,8 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             modifier = Modifier.weight(1f),
             "Rubro",
             jobs,
-            listaProveedores
+            onItemSelected={value -> filtersApplied=true},
+            onItemChange={value -> profesionSeleccionada=value}
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -278,9 +279,18 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             modifier = Modifier.weight(1f),
             "Valoracion",
             rating,
-            listaProveedores
+            onItemSelected={value -> filtersApplied=true},
+            onItemChange={value -> puntajeSeleccionado=value}
         )
     }
+    if (filtersApplied) {
+        val listaConcatenada = listaProveedores.recomendados.value + listaProveedores.general.value
+        listaProveedores.busqueda.value = buscarPorFiltro(listaConcatenada, profesionSeleccionada, puntajeSeleccionado)
+        filtersApplied = false
+
+    }
+
+
 }
 
 @Composable
@@ -288,10 +298,14 @@ fun Filter(
     modifier: Modifier = Modifier,
     categoria: String,
     items: List<String>,
-    listaProveedores: ListaDeProveedores
+    onItemSelected: (Boolean) -> Unit,
+    onItemChange: (String) -> Unit
+
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
+    val offsetY = (-4.dp)
+    val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
 
     Card(
         modifier = modifier
@@ -325,10 +339,6 @@ fun Filter(
         )
     }
 
-
-    val offsetY = (-4.dp)
-    val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
-
     Box(
         modifier = Modifier.offset(y = offsetY)
     ) {
@@ -342,7 +352,8 @@ fun Filter(
             items.forEach { item ->
                 DropdownMenuItem(
                     onClick = {
-                        listaProveedores.buscarPorFiltro(categoria, item)
+                        onItemChange(item)
+                        onItemSelected(true)
                         selectedItem = item
                         expanded = false
                     },
@@ -404,4 +415,21 @@ fun Header(navController: NavController, username: String, paddingH: Dp, padding
 fun ShowHomePreview() {
     val navController = rememberNavController()
     HomeScreen(navController= navController, username="pedro")
+}
+
+
+
+fun buscarPorFiltro(
+    listaProveedores: List<ProviderInfo>,
+    profesion: String,
+    puntaje: String
+): MutableList<ProviderInfo> {
+    // Filtrar la lista de proveedores para obtener solo aquellos con la profesión deseada
+    val proveedoresFiltrados = listaProveedores.filter { it.rol == profesion }
+
+    // Log de las profesiones de los proveedores filtrados
+        Log.d("ProfesionProveedorFiltrado", proveedoresFiltrados.toString())
+
+    // Devolver la lista de proveedores filtrados
+    return proveedoresFiltrados.toMutableList()
 }
