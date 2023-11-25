@@ -16,9 +16,9 @@ PROVIDERS = [
             "Recoleta",
             "Palermo" 
         ],
-        "latitud": -34.608550,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.586299,
+        "longitud": -58.398601,
+        "rangoMax": 1800,
         "servicios_completados": 10,
         "medios_de_contacto": {
             "telefono": "+1144562893",
@@ -71,9 +71,9 @@ PROVIDERS = [
             "San Telmo",
             "La Boca" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.629178,
+        "longitud": -58.362879,
+        "rangoMax": 1500,
         "servicios_completados": 30,
         "medios_de_contacto": {
             "telefono": "+1234567890",
@@ -123,12 +123,12 @@ PROVIDERS = [
             "Mañana"
         ],       
         "ubicaciones": [
-            "Microcentro",
-            "Belgrano" 
+            "San Nicolas",
+            "Montserrat" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.605468,
+        "longitud": -58.379357,
+        "rangoMax": 2500,
         "servicios_completados": 20,
         "medios_de_contacto": {
             "telefono": "+1225489632",
@@ -178,12 +178,12 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Villa Crespo",
-            "Villa Devoto"
+            "Flores",
+            "Parque Avellaneda"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.646025,
+        "longitud": -58.465210,
+        "rangoMax": 3100,
         "servicios_completados": 5,
         "medios_de_contacto": {
             "telefono": "+1225418596",
@@ -219,12 +219,12 @@ PROVIDERS = [
             "Ninguna"
         ],
         "ubicaciones": [
-            "Villa del Parque",
+            "Belgrano",
             "Núñez"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.548366,
+        "longitud": -58.456424,
+        "rangoMax": 1800,
         "servicios_completados": 15,
         "medios_de_contacto": {
             "telefono": "+1221365874",
@@ -261,12 +261,13 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Saavedra",
-            "Flores"
+            "Agronomia",
+            "La Paternal",
+            "Villa del Parque"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.599454,
+        "longitud": -58.481152,
+        "rangoMax": 3800,
         "servicios_completados": 25,
         "medios_de_contacto": {
             "telefono": "+1225144152",
@@ -303,12 +304,12 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Flores",
+            "Almagro",
             "Caballito" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.614148,
+        "longitud": -58.434044,
+        "rangoMax": 2900,
         "servicios_completados": 10,
         "medios_de_contacto": {
             "telefono": "+1234567890",

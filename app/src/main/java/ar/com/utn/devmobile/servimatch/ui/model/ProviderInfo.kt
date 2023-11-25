@@ -25,5 +25,15 @@ data class ProviderInfo(
     val rol: String,
 
     @SerializedName("recomendado")
-    val isRecommended: Boolean
+    val isRecommended: Boolean,
+
+    @SerializedName("latitud")
+    val latitud: Double,
+
+    @SerializedName("longitud")
+    val longitud: Double,
+
+    @SerializedName("rangoMax")
+    val rangoMax: Double
+
 )
