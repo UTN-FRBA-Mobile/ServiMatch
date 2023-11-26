@@ -20,11 +20,11 @@ def tipoServicio():
     try:
         profesiones = [
             'Electricista'
-            , 'Plomero'
-            , 'Carpintero'
+            , 'Plomeria'
+            , 'Carpinteria'
             , 'Albañil'
-            , 'Mecánico'
-            , 'Jardinero'
+            , 'Automotriz'
+            , 'Jardineria'
             , 'Herrero'
             , 'Zapatero'
             , 'Costurero'
@@ -46,8 +46,7 @@ def tipoServicio():
 def valoraciones():
     try:
         valoracion = [
-            '0', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5',
-            '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10'
+             '1', '2', '3',  '4', '5'
         ]
 
         return jsonify(valoracion), 200
@@ -155,7 +154,7 @@ def recomendados():
             "nombre": "Joaquin Benitez",
             "precioCategoria": "$$$$",
             "ubicación": "Palermo",
-            "rol": "plomero"
+            "rol": "Plomeria"
         }]
         return jsonify(recomendados), 200
     except Exception as _:
@@ -369,6 +368,8 @@ def create_reserva(provider_id):
         return jsonify({"message": f"Se creo una solicitud para el dia {date}"}), 200
     except Exception as e:
         return {'error': str(e)}, 500
+
+
 
 # Lista las reservas PENDIENTES del provider <provider_id>
 @app.route('/providers/<int:provider_id>/reservas/pendientes', methods=['GET'])

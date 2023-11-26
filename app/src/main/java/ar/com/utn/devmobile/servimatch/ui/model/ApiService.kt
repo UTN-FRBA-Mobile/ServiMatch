@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("/login")
@@ -44,8 +45,15 @@ interface ApiService {
     @GET("/providers/")
     suspend fun getProviders(): Response<List<ProviderInfo>>
 
+    @GET("/providersByCoordinates")
+    suspend fun getProvidersByCoordinates(
+        @Query("latitud") latitud:Double,
+        @Query("longitud") longitud:Double
+    ): Response<List<ProviderInfo>>
+
     @GET("/providers/{provider_id}/reservas/dates")
     suspend fun getProvidersUnvailableDays(
         @Path("provider_id") idProveedor: Int
     ): Response<List<String>>
+
 }

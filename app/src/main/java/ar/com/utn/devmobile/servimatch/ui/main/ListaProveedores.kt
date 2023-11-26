@@ -28,16 +28,16 @@ class ListaDeProveedores : ViewModel() {
     val general = mutableStateOf<MutableList<ProviderInfo>>(mutableListOf())
 
     //Esta lista solo se muestra si no esta vacia. Y se arma cuando se aplican filtros.
-    val busqueda = mutableStateOf<MutableList<ProviderInfo>>(mutableListOf())
+    var busqueda = mutableStateOf<MutableList<ProviderInfo>>(mutableListOf())
 
     //Esta lista contiene los filtros que aplico
     val filtrosAplicados = mutableListOf<FiltroAplicado>()
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
-    suspend fun getProvedores(){
+    suspend fun getProvedores(latitud:Double, longitud: Double){
         try {
 
-            val response = ApiClient.apiService.getProviders()
+            val response = ApiClient.apiService.getProvidersByCoordinates(latitud,longitud)
             val providers = response.body()
             providers.safeAccess{ providersInfo ->
                 recomendados.value = providersInfo.filter { it -> it.isRecommended }.toMutableList()
@@ -55,7 +55,7 @@ class ListaDeProveedores : ViewModel() {
 
 
     //  Esta funcion se dispara cuando se aprieta algun filtro en el HomeActivity. En el composable Filter.
-    fun buscarPorFiltro(categoria: String, valor: String) {
+    /*fun buscarPorFiltro(categoria: String, valor: String) {
 
         // Buscar si ya existe un filtro con la misma categoría
         val filtroExistenteIndex = filtrosAplicados.indexOfFirst { it.categoria == categoria }
@@ -82,5 +82,5 @@ class ListaDeProveedores : ViewModel() {
             )
 
         }
-    }
+    }*/
 }

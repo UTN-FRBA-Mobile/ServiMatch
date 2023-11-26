@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -160,8 +161,7 @@ fun ShowAlertDialog(result: Boolean, turnoSelected: String, toggleDialog: () -> 
             }
         },
         modifier = Modifier
-            .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
-
+            .border(2.dp, Color.Black, RoundedCornerShape(23.dp))
     )
 }
 

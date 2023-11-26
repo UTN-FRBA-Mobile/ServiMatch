@@ -3,7 +3,6 @@ package ar.com.utn.devmobile.servimatch.ui.main
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,9 +35,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
@@ -49,14 +52,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
+import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
+import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
 import com.google.android.gms.maps.model.LatLng
+import kotlin.math.roundToInt
 
 
 var paddingH = 16.dp
@@ -73,7 +80,8 @@ fun HomeScreen(navController: NavController, username: String) {
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
-        listaDeProveedores.getProvedores()
+        //la longitud y latitud esta hardcodeada
+        listaDeProveedores.getProvedores(-34.608550,-58.427796)
     }
         Column(
             modifier = Modifier
@@ -85,8 +93,6 @@ fun HomeScreen(navController: NavController, username: String) {
         {
 
                 Spacer(modifier = Modifier.height(0.dp))
-
-
                 //Renderizo header.
                 Header(navController, username, 0.dp, 0.dp)
 
@@ -116,7 +122,6 @@ fun HomeScreen(navController: NavController, username: String) {
 
 @Composable
 fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveedores) {
-    val context = LocalContext.current
     val busqueda by remember { listaProveedores.busqueda }
 
     LazyColumn(
@@ -134,8 +139,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(busqueda) { providerInfo ->
-
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -146,7 +150,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.recomendados.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -157,7 +161,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.general.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -168,6 +172,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
 fun Provider(image: String,
              nombre: String,
              apellido: String,
+             profesion: String,
              simboloPrecio: Int,
              ubicaciones: List<String>,
              navController: NavController,
@@ -204,6 +209,10 @@ fun Provider(image: String,
                 color = Turquesa5
             )
             Text(
+                text = profesion,
+                color = Turquesa4
+            )
+            Text(
                 //text = "Desde $precio",
                 text = buildString {repeat(simboloPrecio){append("$")}},
                 fontSize = 16.sp,
@@ -213,6 +222,7 @@ fun Provider(image: String,
                 text = ubicaciones.joinToString(", "),
                 color = Purpura2
             )
+
         }
 
         // IconButton con icono
@@ -240,9 +250,15 @@ fun Provider(image: String,
 }
 
 @Composable
-fun FilterList(listaProveedores: ListaDeProveedores) {
-    var jobs by remember { mutableStateOf(emptyList<String>()) }
-    var rating by remember { mutableStateOf(emptyList<String>()) }
+fun FilterList(listaProveedores: ListaDeProveedores){
+    var jobs by remember {mutableStateOf(emptyList<String>())}
+    var rating by remember {mutableStateOf(emptyList<String>())}
+    var filtersApplied by remember {mutableStateOf(false)} // Variable para controlar el get lista filtrada.
+    var profesionSeleccionada by remember {mutableStateOf("")} //guarda la profesion seleccionada del dropdown
+    var puntajeSeleccionado by remember {mutableStateOf("-1")} //guarda el puntaje selecionado del dropdown
+    var clearRubro by remember {mutableStateOf(false)}
+    var clearPuntaje by remember {mutableStateOf(false)}
+
 
     LaunchedEffect(Unit) {
         try {
@@ -253,10 +269,12 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             Log.d("ERROR", e.toString())
         }
     }
+
     LaunchedEffect(Unit) {
         jobs= ApiClient.apiService.profesiones()
         rating= ApiClient.apiService.rating()
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -265,20 +283,52 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     ) {
 
         Filter(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.6f),
             "Rubro",
             jobs,
-            listaProveedores
+            onItemSelected={value -> filtersApplied=true},
+            onItemChange={value -> profesionSeleccionada=value},
+            clearRubro,
+            onChangeClear={value -> clearRubro=value}
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Filter(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.5f),
             "Valoracion",
             rating,
-            listaProveedores
+            onItemSelected={value -> filtersApplied=true},
+            onItemChange={value -> puntajeSeleccionado=value},
+            clearPuntaje,
+            onChangeClear={value -> clearPuntaje=value}
+
         )
+
+
+        // Icono de recarga
+        IconButton(
+            onClick = {
+                listaProveedores.busqueda.value = mutableListOf()
+                profesionSeleccionada = ""
+                puntajeSeleccionado = "-1"
+                // Realizar alguna acción cuando se presiona el icono de recarga
+                Log.d("ReloadButton", "Botón presionado")
+                clearPuntaje=true
+                clearRubro=true
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Delete, contentDescription = "Recargar")
+        }
+    }
+    if (filtersApplied) {
+        val listaConcatenada = listaProveedores.recomendados.value + listaProveedores.general.value
+        listaProveedores.busqueda.value = buscarPorFiltro(listaConcatenada, profesionSeleccionada, puntajeSeleccionado.toFloat())
+        if(listaProveedores.busqueda.value.isEmpty()){
+            EmptySearch(){filtersApplied = false}
+        }else{
+            filtersApplied = false
+        }
     }
 }
 
@@ -287,10 +337,22 @@ fun Filter(
     modifier: Modifier = Modifier,
     categoria: String,
     items: List<String>,
-    listaProveedores: ListaDeProveedores
+    onItemSelected: (Boolean) -> Unit,
+    onItemChange: (String) -> Unit,
+    clear: Boolean,
+    onChangeClear: (Boolean) -> Unit,
+
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
+    val offsetY = (-4.dp)
+    val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
+
+    if(clear){
+        Log.d("CATEGORIA",categoria)
+        selectedItem=categoria
+        onChangeClear(false)
+    }
 
     Card(
         modifier = modifier
@@ -324,10 +386,6 @@ fun Filter(
         )
     }
 
-
-    val offsetY = (-4.dp)
-    val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
-
     Box(
         modifier = Modifier.offset(y = offsetY)
     ) {
@@ -341,7 +399,8 @@ fun Filter(
             items.forEach { item ->
                 DropdownMenuItem(
                     onClick = {
-                        listaProveedores.buscarPorFiltro(categoria, item)
+                        onItemChange(item)
+                        onItemSelected(true)
                         selectedItem = item
                         expanded = false
                     },
@@ -403,4 +462,62 @@ fun Header(navController: NavController, username: String, paddingH: Dp, padding
 fun ShowHomePreview() {
     val navController = rememberNavController()
     HomeScreen(navController= navController, username="pedro")
+}
+
+
+
+fun buscarPorFiltro(
+    listaProveedores: List<ProviderInfo>,
+    profesion: String,
+    puntaje: Float
+): MutableList<ProviderInfo> {
+    // Verificar si se debe aplicar el filtro de profesión
+    val proveedoresFiltradosPorProfesion = if (profesion.isNotBlank()) {
+        listaProveedores.filter { it.rol == profesion }
+    } else {
+        listaProveedores
+    }
+
+    // Verificar si se debe aplicar el filtro de puntaje
+    val proveedoresFiltradosPorPuntaje = if (puntaje > -1) {
+        proveedoresFiltradosPorProfesion.filter { it.puntaje >= puntaje && it.puntaje < puntaje + 1 }
+    } else {
+        proveedoresFiltradosPorProfesion
+    }
+
+    // Log de las profesiones de los proveedores filtrados
+    Log.d("ProfesionPuntajeProveedorFiltrado", proveedoresFiltradosPorPuntaje.toString())
+
+    // Devolver la lista de proveedores filtrados
+    return proveedoresFiltradosPorPuntaje.toMutableList()
+}
+
+
+@Composable
+fun EmptySearch(function: () -> Unit) {
+    val text = "No hay resultados para esa búsqueda"
+
+    AlertDialog(
+        onDismissRequest = function,
+        title = {
+            Text(text)
+        },
+        confirmButton = {
+            Button(
+                onClick = function,
+                enabled = true,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Turquesa3,
+                    contentColor = Color.White,
+                    disabledContainerColor = Turquesa2,
+                    disabledContentColor = Turquesa3
+                )
+            ) {
+                Text("Aceptar")
+            }
+        },
+        modifier = Modifier
+            .border(2.dp, Color.Black, RoundedCornerShape(23.dp))
+
+    )
 }

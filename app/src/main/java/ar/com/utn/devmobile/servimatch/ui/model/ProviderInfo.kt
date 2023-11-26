@@ -34,6 +34,8 @@ data class ProviderInfo(
     val longitud: Double,
 
     @SerializedName("rangoMax")
-    val rangoMax: Double
+    val rangoMax: Double,
 
+    @SerializedName("puntaje")
+    val puntaje: Float
 )
