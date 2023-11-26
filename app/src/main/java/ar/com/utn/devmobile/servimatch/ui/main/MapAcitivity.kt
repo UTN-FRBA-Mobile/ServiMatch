@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -53,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,8 +66,11 @@ import ar.com.utn.devmobile.servimatch.navController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.model.UserInfo
+import ar.com.utn.devmobile.servimatch.ui.theme.Purple40
+import ar.com.utn.devmobile.servimatch.ui.theme.Purple80
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import coil.compose.AsyncImage
@@ -284,7 +289,8 @@ fun MarcarRangosProviders(providers: List<ProviderInfo>, onProviderClick: (Provi
             radius = provider.rangoMax,
             clickable = true,
             strokeColor = Purpura2,
-            onClick = { onProviderClick(provider) }
+            onClick = { onProviderClick(provider) },
+            fillColor = Purpura2.copy(alpha = 0.1f)
         )
     }
 }
@@ -377,16 +383,19 @@ fun getDirection(geocoder: Geocoder, LatLng: String, markerChange: (MarkerState)
 fun ProviderInfoDialog(navController: NavController, provider: ProviderInfo, onClose: () -> Unit) {
     AlertDialog(
         onDismissRequest = onClose,
-        containerColor = Turquesa1,
+        containerColor = Purple80,
         title = { Text(
+            modifier = Modifier.fillMaxWidth(),
             text = "Información del proveedor",
-            color = Purpura2,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center
         )},
         text = {
             Row(
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 AsyncImage(
                     model = provider.imageResource,
@@ -395,17 +404,17 @@ fun ProviderInfoDialog(navController: NavController, provider: ProviderInfo, onC
                         .size(100.dp)
                         .clip(CircleShape)
                         .background(color = Turquesa3, CircleShape)
-                        .border(1.dp, Turquesa3, CircleShape),
+                        .border(1.dp, Purpura3, CircleShape),
                     contentScale = ContentScale.Crop
                 )
                 Column(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(horizontal = 10.dp)
+                        .padding(start = 20.dp)
                 ) {
                     Text(
                         text = "${provider.name} ${provider.apellido}",
-                        color = Purpura2,
+                        color = Purpura3,
                         fontSize = 24.sp
                     )
                     Text(
@@ -416,20 +425,27 @@ fun ProviderInfoDialog(navController: NavController, provider: ProviderInfo, onC
             }
         },
         dismissButton = {
-            TextButton(onClick = onClose) {
+            Button(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                onClick = onClose,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Purpura2.copy(alpha = 0.5f))
+            ) {
                 Text(
                     text = "Cerrar",
-                    fontSize = 16.sp,
-                    color = Purpura1
+                    fontSize = 16.sp
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = { navController.navigate("profile/${provider.identificador}") }) {
+            Button(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                onClick = { navController.navigate("profile/${provider.identificador}") },
+                shape = RoundedCornerShape(10.dp)
+            ) {
                 Text(
                     text = "Ver",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 16.sp
                 )
             }
         }
