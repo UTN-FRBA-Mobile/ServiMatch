@@ -1,8 +1,6 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
-import android.location.Address
 import android.location.Geocoder
-import android.media.effect.Effect
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -11,26 +9,21 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,23 +43,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
-import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -76,24 +63,28 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import okhttp3.internal.wait
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MapScreen(navController: NavController) {
+fun MapScreen(navController: NavController, username: String) {
+    val username = "admin" //TODO BORRAR, ES PARA PRUEBAS
     var direccion by remember { mutableStateOf("") }
+    var userLat by remember { mutableDoubleStateOf(0.0) }
+    var userLong by remember { mutableDoubleStateOf(0.0) }
     var isLoading by remember { mutableStateOf(true) }
     var colorSearchBar by remember { mutableStateOf(Color.Black) }
     var providers: List<ProviderInfo> by remember { mutableStateOf(emptyList()) }
 
     LaunchedEffect(Unit) {
-        val user = MyPreferences.getInstance().username
-        val userResponse = ApiClient.apiService.getUser(user?:"admin")
+        val userResponse = ApiClient.apiService.getUser(username)
         val providersResponse = ApiClient.apiService.getProviders()
 
-        direccion = userResponse.body()?.ubicacion ?: "Av. Juan Bautista Alberdi 2428"
+        userResponse.body()?.let { user ->
+            userLat = user.latitud
+            userLong = user.longitud
+            direccion = user.direccion
+        }
+
         providers = providersResponse.body() ?: emptyList()
         isLoading = false
     }
@@ -107,21 +98,37 @@ fun MapScreen(navController: NavController) {
                 .align(Alignment.Center)
                 .size(50.dp), color = Turquesa1)
         } else {
-            TopBar(navController = navController, colorSearchBar = colorSearchBar, direccion = direccion, onChange = { value -> direccion = value })
-            Log.d("MAPS", "La dirección que se envia desde inicio es: $direccion")
-            MyGoogleMap(navController = navController, direccion = direccion, providers = providers, changeColor = { color -> colorSearchBar = color })
+            Log.d("MAPS", "Direccion que se envia en TopBar: $direccion")
+            TopBar(
+                navController = navController,
+                colorSearchBar = colorSearchBar,
+                onCancel = { color -> colorSearchBar = color },
+                onChange = { value -> direccion = value }
+            )
+            MyGoogleMap(
+                navController = navController,
+                userLatLong = LatLng(userLat, userLong),
+                direccion = direccion,
+                providers = providers,
+                changeColor = { color -> colorSearchBar = color }
+            )
         }
     }
 }
 
 @Composable
-fun TopBar(navController: NavController, colorSearchBar: Color, direccion: String, onChange: (String) -> Unit) {
+fun TopBar(
+    navController: NavController,
+    colorSearchBar: Color,
+    onCancel: (Color) -> Unit,
+    onChange: (String) -> Unit
+) {
     var isClearVisible by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
-    DisposableEffect(direccion) {
-        isClearVisible = direccion.isNotEmpty()
-        onDispose { }
+    DisposableEffect(searchText) {
+        isClearVisible = searchText.isNotEmpty()
+        onDispose {  }
     }
 
     Row(
@@ -136,7 +143,7 @@ fun TopBar(navController: NavController, colorSearchBar: Color, direccion: Strin
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Perfil Proovedor"
+                contentDescription = "Login"
             )
         }
 
@@ -166,6 +173,8 @@ fun TopBar(navController: NavController, colorSearchBar: Color, direccion: Strin
                         }
                         IconButton(onClick = {
                             searchText = ""
+                            isClearVisible = false
+                            onCancel(Color.Black)
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
@@ -181,12 +190,16 @@ fun TopBar(navController: NavController, colorSearchBar: Color, direccion: Strin
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MyGoogleMap(navController: NavController, direccion: String, providers: List<ProviderInfo>, changeColor: (Color) -> Unit) {
+fun MyGoogleMap(
+    navController: NavController,
+    userLatLong: LatLng,
+    direccion: String, providers: List<ProviderInfo>,
+    changeColor: (Color) -> Unit
+) {
     Log.d("MAPS", "Direccion en MyGoogleMaps: $direccion")
-    var lat by remember { mutableDoubleStateOf(0.0) }
-    var long by remember { mutableDoubleStateOf(0.0) }
     var isLoading by remember { mutableStateOf(true) }
     var selectedProvider by remember { mutableStateOf<ProviderInfo?>(null) }
+    val userMarker = rememberMarkerState( key = "user", position = userLatLong)
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
@@ -196,8 +209,7 @@ fun MyGoogleMap(navController: NavController, direccion: String, providers: List
         getLatLong(
             geocoder = geocoder,
             direccion = direccion,
-            latChange = { _lat -> lat = _lat },
-            longChange = { _long -> long = _long },
+            markerChange = { position -> userMarker.position = position },
             onReady = { isLoading = false },
             changeColor = changeColor
         )
@@ -214,14 +226,12 @@ fun MyGoogleMap(navController: NavController, direccion: String, providers: List
             )
         }
     } else {
-        val userLocation = LatLng(lat, long)
-        val centerLocation = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(userLocation, 12f) }
-        val userMarker = rememberMarkerState( key = "user", position = userLocation)
-
+        val centerLocation = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(userLatLong, 12f) }
         GoogleMap (
             modifier = Modifier
                 .fillMaxSize(),
-            cameraPositionState = centerLocation
+            cameraPositionState = centerLocation,
+            onMapLongClick = { it -> userMarker.position = it }
         ) {
             Marker(
                 state = userMarker,
@@ -244,7 +254,7 @@ fun MyGoogleMap(navController: NavController, direccion: String, providers: List
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun getLatLong(geocoder: Geocoder, direccion: String, latChange: (Double) -> Unit, longChange: (Double) -> Unit, onReady: () -> Unit, changeColor: (Color) -> Unit): Unit {
+fun getLatLong(geocoder: Geocoder, direccion: String, markerChange: (LatLng) -> Unit , onReady: () -> Unit, changeColor: (Color) -> Unit): Unit {
     if (Geocoder.isPresent()) {
         val listener = Geocoder.GeocodeListener { it ->
             Log.d("MAPS", "'it': $it")
@@ -252,8 +262,8 @@ fun getLatLong(geocoder: Geocoder, direccion: String, latChange: (Double) -> Uni
                 Log.e("MAPS", "No se encontró latitud ni longitud")
                 changeColor(Color.Red)
             } else {
-                latChange(it[0].latitude)
-                longChange(it[0].longitude)
+                val newPosition = LatLng(it[0].latitude, it[0].longitude)
+                markerChange(newPosition)
                 Log.d("MAPS", "HAY LAT: ${it[0].latitude} Y LONG: ${it[0].longitude}")
                 changeColor(Color.Black)
             }
@@ -265,34 +275,28 @@ fun getLatLong(geocoder: Geocoder, direccion: String, latChange: (Double) -> Uni
     }
 }
 
+/*
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@Composable
-fun getDireccion(latLng: LatLng): String {
-    val geocoder = Geocoder(LocalContext.current)
-    var direcciones = emptyList<Address>()
-    try {
-        if (Geocoder.isPresent()) {
-            val listener = Geocoder.GeocodeListener { it ->
-                Log.d("MAPS", "en getDirecciones 'it' es: $it")
-                direcciones = it
+fun getDirection(geocoder: Geocoder, LatLng: String, markerChange: (MarkerState) -> Unit , onReady: () -> Unit, changeColor: (Color) -> Unit): Unit {
+    if (Geocoder.isPresent()) {
+        val listener = Geocoder.GeocodeListener { it ->
+            Log.d("MAPS", "'it': $it")
+            if (it.isEmpty()) {
+                Log.e("MAPS", "No se encontró latitud ni longitud")
+                changeColor(Color.Red)
+            } else {
+                val newPosition = LatLng(it[0].latitude, it[0].longitude)
+                markerChange(MarkerState(newPosition))
+                Log.d("MAPS", "HAY LAT: ${it[0].latitude} Y LONG: ${it[0].longitude}")
+                changeColor(Color.Black)
             }
-            geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1, listener)
-            if (direcciones.isNotEmpty()) {
-                val address = direcciones[0]
-                Log.d("MAPS", "Dirección: ${address.getAddressLine(0)}")
-                return address.getAddressLine(0)
-            }
-            Log.e("MAPS", "Error, no se encontró ninguna dirección: $direcciones")
-            return "Dirección desconocida"
-        } else {
-            Log.e("MAPS", "Problemas con GEOCODER")
-            return "Dirección desconocida"
+            onReady()
         }
-    } catch (e: Exception) {
-        Log.e("MAPS", "Error al obtener la dirección:", e)
-        return "Dirección desconocida"
+        geocoder.getFromLocationName(direccion, 1, listener)
+    } else {
+        Log.e("MAPS", "Problemas con GEOCODER")
     }
-}
+}*/
 
 @Composable
 fun ProviderInfoDialog(navController: NavController, provider: ProviderInfo, onClose: () -> Unit) {

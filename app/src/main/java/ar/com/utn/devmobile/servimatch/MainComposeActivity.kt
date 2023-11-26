@@ -50,14 +50,18 @@ class MainComposeActivity : ComponentActivity() {
 @Composable
 private fun App() {
     navController = rememberNavController()
-    NavHost(navController = navController as NavHostController, startDestination = "map") {
+    NavHost(navController = navController as NavHostController, startDestination = "map/admin") {
 
         composable("login") {
             LoginScreen(navController = navController)
         }
 
-        composable(route = "map") {
-            MapScreen(navController = navController)
+        composable(
+            route = "map/{username}",
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            MapScreen(navController = navController, username = username)
         }
 
         composable(

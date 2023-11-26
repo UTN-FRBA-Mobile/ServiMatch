@@ -12,7 +12,7 @@ interface ApiService {
     @POST("/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<JSONObject>
 
-    @GET("/user/{username}")
+    @GET("/users/{username}")
     suspend fun getUser(
         @Path("username") username: String
     ): Response<UserInfo>
