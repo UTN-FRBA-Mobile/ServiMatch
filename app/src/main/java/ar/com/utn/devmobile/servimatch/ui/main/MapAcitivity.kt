@@ -250,6 +250,17 @@ fun MyGoogleMap(
                 )
             }
         }
+
+        Row () {
+            Text(text = )
+            IconButton(onClick = { onChange(searchText) }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search"
+                )
+            }
+        }
+
     }
 }
 
