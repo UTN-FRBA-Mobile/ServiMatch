@@ -314,7 +314,7 @@ fun GoHomeSection(
         Button(
             modifier = Modifier.padding(horizontal = 20.dp),
             onClick = {
-                MyPreferences.getInstance().set("latlon_user", userPosition)
+                MyPreferences.getInstance().set("latlong_user", userPosition)
                 navController.navigate("home/$username")
             },
             shape = RoundedCornerShape(10.dp),

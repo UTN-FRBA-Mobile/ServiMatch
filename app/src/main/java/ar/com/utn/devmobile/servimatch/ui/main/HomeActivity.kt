@@ -80,8 +80,11 @@ fun HomeScreen(navController: NavController, username: String) {
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
-        //la longitud y latitud esta hardcodeada
-        listaDeProveedores.getProvedores(-34.608550,-58.427796)
+        val userLocation = MyPreferences.getInstance().get("latlong_user") as? LatLng
+        if (userLocation != null) {
+            listaDeProveedores.getProvedores(userLocation)
+        }
+
     }
         Column(
             modifier = Modifier
