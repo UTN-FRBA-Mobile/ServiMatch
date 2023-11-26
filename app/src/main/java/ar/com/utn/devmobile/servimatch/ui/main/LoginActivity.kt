@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.navArgument
 import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.R
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
@@ -161,8 +162,8 @@ fun LoginScreen(navController: NavController) {
 }
 
 suspend fun refreshUserToken() {
-    val username = MyPreferences.getInstance().get("username")?:""
-    val token    = MyPreferences.getInstance().get("token")?:""
+    val username = MyPreferences.getInstance().get("username") as? String ?:""
+    val token    = MyPreferences.getInstance().get("token") as? String ?:""
     val tokenResponse = ApiClient.apiService.saveUserToken(username, TokenRequest(token))
     if (tokenResponse.isSuccessful) {
         Log.d("FCM", "TOKEN: $token")

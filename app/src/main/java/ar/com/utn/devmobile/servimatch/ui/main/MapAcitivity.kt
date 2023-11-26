@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import ar.com.utn.devmobile.servimatch.MyPreferences
+import ar.com.utn.devmobile.servimatch.navController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.model.UserInfo
@@ -123,7 +125,10 @@ fun MapScreen(navController: NavController, username: String) {
                 changeColor = { color -> colorSearchBar = color },
                 onChangeMarker = { position -> userMarker.position = position }
             )
-            GoHomeSection(providers, userMarker.position)
+           /* GoHomeSection(
+                navController = navController,
+                providers, userMarker.position
+            )*/
         }
 
     }
@@ -265,7 +270,7 @@ fun MyGoogleMap(
                     selectedProvider = provider
                 })
             }
-            GoHomeSection(providers, userMarker.position)
+            GoHomeSection(navController, providers, userMarker.position, user.username)
         }
     }
 
@@ -285,8 +290,20 @@ fun MarcarRangosProviders(providers: List<ProviderInfo>, onProviderClick: (Provi
 }
 
 @Composable
-fun GoHomeSection(providers: List<ProviderInfo>, userPosition: LatLng) {
+fun GoHomeSection(
+    navController: NavController,
+    providers: List<ProviderInfo>,
+    userPosition: LatLng,
+    username: String
+) {
     var proveedoresCercanos: List<ProviderInfo> by remember { mutableStateOf(emptyList()) }
+    var hayProveedores by remember { mutableStateOf(true) }
+
+    DisposableEffect(userPosition) {
+        proveedoresCercanos = calcularProveedoresCercanos(providers, userPosition)
+        hayProveedores = proveedoresCercanos.isNotEmpty()
+        onDispose {} // Cleanup
+    }
 
     Box(
         modifier = Modifier
@@ -297,10 +314,11 @@ fun GoHomeSection(providers: List<ProviderInfo>, userPosition: LatLng) {
         Button(
             modifier = Modifier.padding(horizontal = 20.dp),
             onClick = {
-                proveedoresCercanos = calcularProveedoresCercanos(providers, userPosition)
-                Log.d("MAPS", "Hay ${proveedoresCercanos.size} proveedores cercanos a tu ubicación")
+                MyPreferences.getInstance().set("latlon_user", userPosition)
+                navController.navigate("home/$username")
             },
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            enabled = hayProveedores
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
@@ -441,11 +459,3 @@ fun calcularDistanciaEntrePuntos(user: LatLng, provider: LatLng): Float {
 
     return location1.distanceTo(location2)
 }
-
-/*
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ShowMapActivity() {
-    val navController = rememberNavController()
-    MapScreen(navController = navController, username = "hi")
-}*/
