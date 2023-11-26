@@ -35,6 +35,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -252,7 +254,8 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     var filtersApplied by remember { mutableStateOf(false) } // Variable para controlar el get lista filtrada.
     var profesionSeleccionada by remember { mutableStateOf("") } //guarda la profesion seleccionada del dropdown
     var puntajeSeleccionado by remember { mutableStateOf("-1") } //guarda el puntaje selecionado del dropdown
-    var result by remember { mutableStateOf<List<ProviderInfo>>(mutableListOf())}
+    var clearRubro by remember { mutableStateOf(false) }
+    var clearPuntaje by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -278,22 +281,43 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
     ) {
 
         Filter(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.6f),
             "Rubro",
             jobs,
             onItemSelected={value -> filtersApplied=true},
-            onItemChange={value -> profesionSeleccionada=value}
+            onItemChange={value -> profesionSeleccionada=value},
+            clearRubro,
+            onChangeClear={value -> clearRubro=value}
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Filter(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.5f),
             "Valoracion",
             rating,
             onItemSelected={value -> filtersApplied=true},
-            onItemChange={value -> puntajeSeleccionado=value}
+            onItemChange={value -> puntajeSeleccionado=value},
+            clearPuntaje,
+            onChangeClear={value -> clearPuntaje=value}
+
         )
+
+
+        // Icono de recarga
+        IconButton(
+            onClick = {
+                listaProveedores.busqueda.value = mutableListOf()
+                profesionSeleccionada = ""
+                puntajeSeleccionado = "-1"
+                // Realizar alguna acción cuando se presiona el icono de recarga
+                Log.d("ReloadButton", "Botón presionado")
+                clearPuntaje=true
+                clearRubro=true
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Delete, contentDescription = "Recargar")
+        }
     }
     if (filtersApplied) {
         val listaConcatenada = listaProveedores.recomendados.value + listaProveedores.general.value
@@ -304,8 +328,6 @@ fun FilterList(listaProveedores: ListaDeProveedores) {
             filtersApplied = false
         }
     }
-
-
 }
 
 @Composable
@@ -314,13 +336,21 @@ fun Filter(
     categoria: String,
     items: List<String>,
     onItemSelected: (Boolean) -> Unit,
-    onItemChange: (String) -> Unit
+    onItemChange: (String) -> Unit,
+    clear: Boolean,
+    onChangeClear: (Boolean) -> Unit,
 
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(categoria) }
     val offsetY = (-4.dp)
     val maxHeight = 400.dp // Puedes ajustar la altura máxima según tus necesidades
+
+    if(clear){
+        Log.d("CATEGORIA",categoria)
+        selectedItem=categoria
+        onChangeClear(false)
+    }
 
     Card(
         modifier = modifier
