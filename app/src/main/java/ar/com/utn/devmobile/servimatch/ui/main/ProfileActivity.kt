@@ -79,20 +79,13 @@ fun ProfileScreen(navController: NavController) {
             }
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Turquesa1)
-    ) {
+
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth().background(Turquesa1).zIndex(10f),
-                verticalAlignment = Alignment.CenterVertically
-
+                modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical= paddingV)
             ) {
                 IconButton(
-                    onClick = { navController.navigateUp() },
-                    modifier = Modifier.padding(0.dp)
+                    onClick = { navController.navigateUp() }
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
@@ -104,7 +97,7 @@ fun ProfileScreen(navController: NavController) {
             providerProfile?.let { ProviderProfileContent(navController, it) }
         }
     }
-}
+
 
 
 @Composable
@@ -178,7 +171,7 @@ fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = paddingV),
+            .padding(horizontal = paddingH, vertical= paddingV),
         horizontalArrangement = Arrangement.SpaceAround
     ){
         PuntajeItem(servicios_completados, "Servicios completados")
@@ -238,7 +231,8 @@ fun Boton(texto: String, onClick: ()->Unit) {
 fun Reseñas(comentarios: List<Comentario>) {
     Column (
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+        .padding(vertical= paddingV),
         horizontalAlignment = Alignment.Start
     ) {
         Text(

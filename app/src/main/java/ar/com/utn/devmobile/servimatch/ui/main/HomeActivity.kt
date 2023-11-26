@@ -208,7 +208,7 @@ fun Provider(image: String,
             )
             Text(
                 text = profesion,
-                color = Turquesa3
+                color = Turquesa4
             )
             Text(
                 //text = "Desde $precio",
