@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -50,6 +52,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
@@ -82,10 +85,16 @@ fun ProfileScreen(navController: NavController) {
 
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth().background(Turquesa1).padding(horizontal= paddingH,vertical= paddingV)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Turquesa1)
+                    .zIndex(10f),
+                verticalAlignment = Alignment.CenterVertically
+
             ) {
                 IconButton(
-                    onClick = { navController.navigateUp() }
+                    onClick = { navController.navigateUp() },
+                    modifier = Modifier.padding(0.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
@@ -94,6 +103,7 @@ fun ProfileScreen(navController: NavController) {
                 }
                 Text(text = "Volver")
             }
+
             providerProfile?.let { ProviderProfileContent(navController, it) }
         }
     }
@@ -174,28 +184,43 @@ fun Puntajes(servicios_completados: Int, puntaje: Number, comentarios: Int) {
             .padding(horizontal = paddingH, vertical= paddingV),
         horizontalArrangement = Arrangement.SpaceAround
     ){
-        PuntajeItem(servicios_completados, "Servicios completados")
-        PuntajeItem(puntaje, "Puntaje")
-        PuntajeItem(comentarios, "Comentarios")
+        PuntajeItem(servicios_completados, "Servicios completados",  modifier = Modifier.weight(0.5f))
+        PuntajeItem(puntaje, "Puntaje",  modifier = Modifier.weight(0.5f))
+        PuntajeItem(comentarios, "Comentarios",  modifier = Modifier.weight(0.5f))
     }
 }
 
 @Composable
-fun PuntajeItem(puntaje: Number, texto: String) {
-    Column {
+fun PuntajeItem(
+    puntaje: Number,
+    texto: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
         Text(
             text = puntaje.toString(),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Turquesa3,
             modifier = Modifier
-                .align(CenterHorizontally),
+                .align(CenterHorizontally)
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Center // Alinea el texto al centro
         )
         Text(
-            text = texto
+            text = texto,
+            modifier = Modifier
+                .align(CenterHorizontally),
+            textAlign = TextAlign.Center // Alinea el texto al centro
         )
     }
 }
+
+
 
 @Composable
 fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
@@ -208,6 +233,7 @@ fun BotonesAcciones(navController : NavController, persona: ProviderProfile) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Boton(texto = "Reservar", onClick = {navController.navigate(route = "booking/${persona.id}/${persona.precio_visita}/$disponibilidadStr")})
+        Spacer(modifier = Modifier.width(20.dp))
         Boton(texto = "Contactame", onClick = {navController.navigate(route = "contactMe/${persona.id}")})
     }
 }

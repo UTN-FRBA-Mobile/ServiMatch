@@ -248,14 +248,14 @@ fun Provider(image: String,
 }
 
 @Composable
-fun FilterList(listaProveedores: ListaDeProveedores) {
-    var jobs by remember { mutableStateOf(emptyList<String>()) }
-    var rating by remember { mutableStateOf(emptyList<String>()) }
-    var filtersApplied by remember { mutableStateOf(false) } // Variable para controlar el get lista filtrada.
-    var profesionSeleccionada by remember { mutableStateOf("") } //guarda la profesion seleccionada del dropdown
-    var puntajeSeleccionado by remember { mutableStateOf("-1") } //guarda el puntaje selecionado del dropdown
-    var clearRubro by remember { mutableStateOf(false) }
-    var clearPuntaje by remember { mutableStateOf(false) }
+fun FilterList(listaProveedores: ListaDeProveedores){
+    var jobs by remember {mutableStateOf(emptyList<String>())}
+    var rating by remember {mutableStateOf(emptyList<String>())}
+    var filtersApplied by remember {mutableStateOf(false)} // Variable para controlar el get lista filtrada.
+    var profesionSeleccionada by remember {mutableStateOf("")} //guarda la profesion seleccionada del dropdown
+    var puntajeSeleccionado by remember {mutableStateOf("-1")} //guarda el puntaje selecionado del dropdown
+    var clearRubro by remember {mutableStateOf(false)}
+    var clearPuntaje by remember {mutableStateOf(false)}
 
 
     LaunchedEffect(Unit) {
