@@ -20,11 +20,11 @@ def tipoServicio():
     try:
         profesiones = [
             'Electricista'
-            , 'Plomero'
-            , 'Carpintero'
+            , 'Plomeria'
+            , 'Carpinteria'
             , 'Albañil'
             , 'Mecánico'
-            , 'Jardinero'
+            , 'Jardineria'
             , 'Herrero'
             , 'Zapatero'
             , 'Costurero'
@@ -154,7 +154,7 @@ def recomendados():
             "nombre": "Joaquin Benitez",
             "precioCategoria": "$$$$",
             "ubicación": "Palermo",
-            "rol": "plomero"
+            "rol": "Plomeria"
         }]
         return jsonify(recomendados), 200
     except Exception as _:

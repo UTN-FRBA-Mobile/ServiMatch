@@ -50,6 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
+import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
@@ -134,7 +135,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(busqueda) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             } else {
                 item {
@@ -145,7 +146,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.recomendados.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -156,7 +157,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
                     )
                 }
                 items(listaProveedores.general.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
                 }
             }
         }
@@ -167,6 +168,7 @@ fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveed
 fun Provider(image: String,
              nombre: String,
              apellido: String,
+             profesion: String,
              simboloPrecio: Int,
              ubicaciones: List<String>,
              navController: NavController,
@@ -203,6 +205,10 @@ fun Provider(image: String,
                 color = Turquesa5
             )
             Text(
+                text = profesion,
+                color = Turquesa3
+            )
+            Text(
                 //text = "Desde $precio",
                 text = buildString {repeat(simboloPrecio){append("$")}},
                 fontSize = 16.sp,
@@ -212,6 +218,7 @@ fun Provider(image: String,
                 text = ubicaciones.joinToString(", "),
                 color = Purpura2
             )
+
         }
 
         // IconButton con icono
