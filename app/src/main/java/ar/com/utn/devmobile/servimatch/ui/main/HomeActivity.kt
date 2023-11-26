@@ -441,7 +441,7 @@ fun buscarPorFiltro(
 
     // Verificar si se debe aplicar el filtro de puntaje
     val proveedoresFiltradosPorPuntaje = if (puntaje > -1) {
-        proveedoresFiltradosPorProfesion.filter  { it.puntaje.roundToInt() == puntaje.roundToInt()  }
+        proveedoresFiltradosPorProfesion.filter { it.puntaje >= puntaje && it.puntaje < puntaje + 1 }
     } else {
         proveedoresFiltradosPorProfesion
     }
@@ -452,6 +452,8 @@ fun buscarPorFiltro(
     // Devolver la lista de proveedores filtrados
     return proveedoresFiltradosPorPuntaje.toMutableList()
 }
+
+
 @Composable
 fun EmptySearch(function: () -> Unit) {
     val text = "No hay resultados para esa búsqueda"
@@ -476,8 +478,7 @@ fun EmptySearch(function: () -> Unit) {
             }
         },
         modifier = Modifier
-            .border(width = 2.dp, color = Color.Black) // Agregar un borde negro al AlertDialog
-            .background(MaterialTheme.colorScheme.background) // Fondo blanco
-            .clip(RoundedCornerShape(0.dp)) // Establecer esquinas rectangulares
+            .border(2.dp, Color.Black, RoundedCornerShape(23.dp))
+
     )
 }
