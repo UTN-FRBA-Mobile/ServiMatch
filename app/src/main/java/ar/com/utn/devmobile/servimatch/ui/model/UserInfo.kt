@@ -7,7 +7,7 @@ data class UserInfo(
     val username: String,
 
     @SerializedName("direccion")
-    val direccion: String,
+    var direccion: String,
 
     @SerializedName("latitud")
     val latitud: Double,

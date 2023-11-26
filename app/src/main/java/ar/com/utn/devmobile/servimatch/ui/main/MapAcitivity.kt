@@ -1,30 +1,40 @@
 package ar.com.utn.devmobile.servimatch.ui.main
 
 import android.location.Geocoder
+import android.location.Location
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,12 +53,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
+import ar.com.utn.devmobile.servimatch.ui.model.UserInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
@@ -68,9 +81,7 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun MapScreen(navController: NavController, username: String) {
     val username = "admin" //TODO BORRAR, ES PARA PRUEBAS
-    var direccion by remember { mutableStateOf("") }
-    var userLat by remember { mutableDoubleStateOf(0.0) }
-    var userLong by remember { mutableDoubleStateOf(0.0) }
+    var user: UserInfo by remember { mutableStateOf(UserInfo("admin", "", 0.0, 0.0)) }
     var isLoading by remember { mutableStateOf(true) }
     var colorSearchBar by remember { mutableStateOf(Color.Black) }
     var providers: List<ProviderInfo> by remember { mutableStateOf(emptyList()) }
@@ -78,43 +89,46 @@ fun MapScreen(navController: NavController, username: String) {
     LaunchedEffect(Unit) {
         val userResponse = ApiClient.apiService.getUser(username)
         val providersResponse = ApiClient.apiService.getProviders()
-
-        userResponse.body()?.let { user ->
-            userLat = user.latitud
-            userLong = user.longitud
-            direccion = user.direccion
+        userResponse.body()?.let { repsonseUser ->
+            user = repsonseUser
         }
-
         providers = providersResponse.body() ?: emptyList()
         isLoading = false
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        if(isLoading) {
-            CircularProgressIndicator(modifier = Modifier
-                .align(Alignment.Center)
-                .size(50.dp), color = Turquesa1)
-        } else {
-            Log.d("MAPS", "Direccion que se envia en TopBar: $direccion")
+    if(isLoading){
+        CircularProgressIndicator(modifier = Modifier
+            .fillMaxSize(),
+            color = Turquesa1
+        )
+    }
+    else {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxHeight()
+        ) {
+            val userMarker = rememberMarkerState( key = "user", position = LatLng(user.latitud, user.longitud))
             TopBar(
                 navController = navController,
                 colorSearchBar = colorSearchBar,
                 onCancel = { color -> colorSearchBar = color },
-                onChange = { value -> direccion = value }
+                onChange = { value -> user.direccion = value }
             )
             MyGoogleMap(
                 navController = navController,
-                userLatLong = LatLng(userLat, userLong),
-                direccion = direccion,
+                userMarker = userMarker,
+                user = user,
                 providers = providers,
-                changeColor = { color -> colorSearchBar = color }
+                changeColor = { color -> colorSearchBar = color },
+                onChangeMarker = { position -> userMarker.position = position }
             )
+            GoHomeSection(providers, userMarker.position)
         }
+
     }
 }
+
 
 @Composable
 fun TopBar(
@@ -192,75 +206,107 @@ fun TopBar(
 @Composable
 fun MyGoogleMap(
     navController: NavController,
-    userLatLong: LatLng,
-    direccion: String, providers: List<ProviderInfo>,
-    changeColor: (Color) -> Unit
+    userMarker: MarkerState,
+    user: UserInfo,
+    providers: List<ProviderInfo>,
+    changeColor: (Color) -> Unit,
+    onChangeMarker: (LatLng) -> Unit
 ) {
-    Log.d("MAPS", "Direccion en MyGoogleMaps: $direccion")
+    val userLatLong = LatLng(user.latitud, user.longitud)
+    Log.d("MAPS", "Direccion en MyGoogleMaps: ${user.direccion}")
     var isLoading by remember { mutableStateOf(true) }
     var selectedProvider by remember { mutableStateOf<ProviderInfo?>(null) }
-    val userMarker = rememberMarkerState( key = "user", position = userLatLong)
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
 
-    LaunchedEffect(direccion) {
+    LaunchedEffect(user.direccion) {
         isLoading = true
         getLatLong(
             geocoder = geocoder,
-            direccion = direccion,
-            markerChange = { position -> userMarker.position = position },
+            direccion = user.direccion,
+            markerChange = onChangeMarker,
             onReady = { isLoading = false },
             changeColor = changeColor
         )
     }
 
     if (isLoading) {
-        Box {
+        Row (verticalAlignment = Alignment.CenterVertically){
             CircularProgressIndicator(
                 modifier = Modifier
                     .fillMaxSize()
-                    .align(Alignment.Center)
                     .size(50.dp),
                 color = Turquesa1
             )
         }
     } else {
         val centerLocation = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(userLatLong, 12f) }
-        GoogleMap (
+        Box (
             modifier = Modifier
-                .fillMaxSize(),
-            cameraPositionState = centerLocation,
-            onMapLongClick = { it -> userMarker.position = it }
+                .fillMaxSize()
+        ){
+            GoogleMap (
+                cameraPositionState = centerLocation,
+                onMapLongClick = { it -> userMarker.position = it }
+            ) {
+                Marker(
+                    state = userMarker,
+                    icon = BitmapDescriptorFactory.defaultMarker()
+                )
+                if (selectedProvider != null) {
+                    ProviderInfoDialog(
+                        navController = navController,
+                        provider = selectedProvider!!,
+                        onClose = { selectedProvider = null }
+                    )
+                }
+                MarcarRangosProviders(providers = providers, onProviderClick = { provider ->
+                    selectedProvider = provider
+                })
+            }
+            GoHomeSection(providers, userMarker.position)
+        }
+    }
+
+}
+
+@Composable
+fun MarcarRangosProviders(providers: List<ProviderInfo>, onProviderClick: (ProviderInfo) -> Unit) {
+    for (provider in providers) {
+        Circle(
+            center = LatLng(provider.latitud, provider.longitud),
+            radius = provider.rangoMax,
+            clickable = true,
+            strokeColor = Purpura2,
+            onClick = { onProviderClick(provider) }
+        )
+    }
+}
+
+@Composable
+fun GoHomeSection(providers: List<ProviderInfo>, userPosition: LatLng) {
+    var proveedoresCercanos: List<ProviderInfo> by remember { mutableStateOf(emptyList()) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Button(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            onClick = {
+                proveedoresCercanos = calcularProveedoresCercanos(providers, userPosition)
+                Log.d("MAPS", "Hay ${proveedoresCercanos.size} proveedores cercanos a tu ubicación")
+            },
+            shape = RoundedCornerShape(10.dp)
         ) {
-            Marker(
-                state = userMarker,
-                icon = BitmapDescriptorFactory.defaultMarker()
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "home page"
             )
-            if (selectedProvider != null) {
-                ProviderInfoDialog(navController = navController, provider = selectedProvider!!, onClose = { selectedProvider = null })
-            }
-            for (provider in providers) {
-                Circle(
-                    center = LatLng(provider.latitud, provider.longitud),
-                    radius = provider.rangoMax,
-                    clickable = true,
-                    strokeColor = Purpura2,
-                    onClick = { selectedProvider = provider }
-                )
-            }
         }
-
-        Row () {
-            Text(text = )
-            IconButton(onClick = { onChange(searchText) }) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
-                )
-            }
-        }
-
     }
 }
 
@@ -371,3 +417,35 @@ fun ProviderInfoDialog(navController: NavController, provider: ProviderInfo, onC
         }
     )
 }
+
+fun calcularProveedoresCercanos(proveedores: List<ProviderInfo>, user: LatLng): List<ProviderInfo> {
+    val proveedoresCercanos = mutableListOf<ProviderInfo>()
+    for (proveedor in proveedores) {
+        val proveedorLocation = LatLng(proveedor.latitud, proveedor.longitud)
+        val distancia = calcularDistanciaEntrePuntos(user, proveedorLocation)
+        if (distancia <= proveedor.rangoMax) {
+            proveedoresCercanos.add(proveedor)
+        }
+    }
+    return proveedoresCercanos
+}
+
+fun calcularDistanciaEntrePuntos(user: LatLng, provider: LatLng): Float {
+    val location1 = Location("User")
+    location1.latitude = user.latitude
+    location1.longitude = user.longitude
+
+    val location2 = Location("Provider")
+    location2.latitude = provider.latitude
+    location2.longitude = provider.longitude
+
+    return location1.distanceTo(location2)
+}
+
+/*
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ShowMapActivity() {
+    val navController = rememberNavController()
+    MapScreen(navController = navController, username = "hi")
+}*/
