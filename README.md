@@ -28,8 +28,7 @@ Confiá en la experiencia de otros usuarios. Lee reseñas y calificaciones genui
 
 Descarga ServiMatch hoy y descubrí una manera más inteligente y eficiente de conectar con profesionales de servicios. Simplificá tu vida y deja que ServiMatch haga el trabajo pesado por vos.
 
-![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/4e5fcad7-ee50-4aab-bf2f-259193a1812c)
-![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/ba86476f-323d-4c87-a334-b4af38451249)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/27da96bf-d7b4-4e48-bc4f-1ca54fe3a8d8)
 
 
 
