@@ -4,5 +4,6 @@
     <string name="recomendados">Recomendados</string>
     <string name="mas_resultados">MAS</string>
     <string name="resultados">Resultados</string>
+    <string name="proveedores_empty">Ups! No hay proveedores disponibles en tu zona</string>
 
 </resources>

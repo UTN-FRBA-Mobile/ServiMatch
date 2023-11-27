@@ -36,7 +36,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,13 +46,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
-import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura2
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa1
@@ -63,7 +62,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
 import com.google.android.gms.maps.model.LatLng
-import kotlin.math.roundToInt
+
 
 
 var paddingH = 16.dp
@@ -78,6 +77,7 @@ fun HomeScreen(navController: NavController, username: String) {
     // Acceder a la variable isLoading
     val isLoading = listaDeProveedores.isLoading
 
+
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
         val userLocation = MyPreferences.getInstance().get("latlong_user") as? LatLng
@@ -89,6 +89,7 @@ fun HomeScreen(navController: NavController, username: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .fillMaxHeight()
                 .background(Turquesa1)
                 .padding(horizontal = paddingH, vertical = paddingV),
             verticalArrangement = Arrangement.Top
@@ -126,50 +127,70 @@ fun HomeScreen(navController: NavController, username: String) {
 @Composable
 fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveedores) {
     val busqueda by remember { listaProveedores.busqueda }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth(),
+    if (listaProveedores.general.value.isNotEmpty() && listaProveedores.recomendados.value.isNotEmpty()){
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
             //.padding(horizontal = 8.dp, vertical = 4.dp),
-        content = {
-         if (busqueda.isNotEmpty()) {
+            content = {
+                if (busqueda.isNotEmpty()) {
 
-                item {
-                    Text(
-                        text = stringResource(id = R.string.resultados) + " (${busqueda.size})",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = PurpleGrey40,
-                    )
+                    item {
+                        Text(
+                            text = stringResource(id = R.string.resultados) + " (${busqueda.size})",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = PurpleGrey40,
+                        )
+                    }
+                    items(busqueda) { providerInfo ->
+                         Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                     }
+                } else {
+                    item {
+                        Text(
+                            text = stringResource(id = R.string.recomendados) + " (${listaProveedores.recomendados.value.size})",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Turquesa4,
+                        )
+                    }
+                    items(listaProveedores.recomendados.value) { providerInfo ->
+                         Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                     }
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.mas_resultados) + " (${listaProveedores.general.value.size})",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = PurpleGrey40,
+                        )
+                    }
+                    items(listaProveedores.general.value) { providerInfo ->
+                        Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
+                    }
                 }
-                items(busqueda) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol, providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
-                }
-            } else {
-                item {
-                    Text(
-                        text = stringResource(id = R.string.recomendados) + " (${listaProveedores.recomendados.value.size})",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Turquesa4,
-                    )
-                }
-                items(listaProveedores.recomendados.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido, providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
-                }
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(id = R.string.mas_resultados) + " (${listaProveedores.general.value.size})",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = PurpleGrey40,
-                    )
-                }
-                items(listaProveedores.general.value) { providerInfo ->
-                    Provider(providerInfo.imageResource, providerInfo.name, providerInfo.apellido,providerInfo.rol,providerInfo.priceSimbol, providerInfo.location, navController,providerInfo.identificador)
-                }
-            }
-        }
+    }
     )
-}
+    }else{
+          Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            )
+            {
+                Text(
+                    text = stringResource(id = R.string.proveedores_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Turquesa5,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
+
+    }
 
 @Composable
 fun Provider(image: String,
@@ -183,7 +204,7 @@ fun Provider(image: String,
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical=paddingV),
+            .padding(vertical = paddingV),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Imagen
@@ -396,7 +417,7 @@ fun Filter(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                    .offset(y = offsetY)
+                .offset(y = offsetY)
                 .heightIn(max = maxHeight)
         ) {
             items.forEach { item ->
