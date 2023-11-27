@@ -136,33 +136,36 @@ fun ShowAlertDialog(result: Boolean, turnoSelected: String, toggleDialog: () -> 
         !result -> "Hubo un error al crear la reserva"
         else -> "Reserva Creada: $turnoSelected"
     }
-
-    AlertDialog(
-        onDismissRequest = {
-            toggleDialog()
-        },
-        title = {
-            Text(text);
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    toggleDialog()
-                },
-                enabled = true,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Turquesa3,
-                    contentColor = Color.White,
-                    disabledContainerColor = Turquesa2,
-                    disabledContentColor = Turquesa3
-                )
-            ) {
-                Text("Aceptar")
-            }
-        },
-        modifier = Modifier
-            .border(2.dp, Color.Black, RoundedCornerShape(23.dp))
-    )
+    if (result){
+        AlertDialog(
+            onDismissRequest = {
+                toggleDialog()
+            },
+            title = {
+                Text(text);
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        toggleDialog()
+                    },
+                    enabled = true,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Turquesa3,
+                        contentColor = Color.White,
+                        disabledContainerColor = Turquesa2,
+                        disabledContentColor = Turquesa3
+                    )
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            modifier = Modifier
+                .border(2.dp, Color.Black, RoundedCornerShape(23.dp))
+        )
+    } else {
+        CircularProgressIndicator()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -295,7 +298,10 @@ fun CustomDatePicker(dateState: DatePickerState, idProveedor: Int){
 
     if (isLoading) {
         Row(
-            modifier = Modifier.fillMaxWidth().offset(y = (-35).dp).zIndex(-1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = (-35).dp)
+                .zIndex(-1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             CircularProgressIndicator()
