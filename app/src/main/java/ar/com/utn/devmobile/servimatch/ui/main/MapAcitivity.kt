@@ -221,7 +221,6 @@ fun MyGoogleMap(
     changeColor: (Color) -> Unit,
 ) {
     val userLatLong = LatLng(user.latitud, user.longitud)
-    Log.d("MAPS", "Direccion en MyGoogleMaps: $direccion")
     var isLoading by remember { mutableStateOf(true) }
     var selectedProvider by remember { mutableStateOf<ProviderInfo?>(null) }
     val userMarker = rememberMarkerState( key = "user", position = LatLng(user.latitud, user.longitud))
@@ -250,6 +249,7 @@ fun MyGoogleMap(
             )
         }
     } else {
+        Log.d("MAPS", "LATLONG: ${userMarker.position}")
         val centerLocation = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(userLatLong, 12f) }
         Box (
             modifier = Modifier
