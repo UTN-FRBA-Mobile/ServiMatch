@@ -1,4 +1,4 @@
-<div align="left">
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/8a4b1960-1709-471c-98e7-b1c2e51e37b3)<div align="left">
     <a>
         <img width="150" src="https://www.frba.utn.edu.ar/wp-content/uploads/2016/08/logo-utn.ba-horizontal-e1471367724904.jpg" alt="ServiMatch"/>
     </a>
@@ -29,7 +29,11 @@ Confiá en la experiencia de otros usuarios. Lee reseñas y calificaciones genui
 Descarga ServiMatch hoy y descubrí una manera más inteligente y eficiente de conectar con profesionales de servicios. Simplificá tu vida y deja que ServiMatch haga el trabajo pesado por vos.
 
 ![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/987e6f98-4786-49a8-bb4a-88211fb1f441)
-![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/3d6803c3-d69a-4224-a821-d7c102cdae49)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/f103cb7a-1562-400d-bd0c-82b6f63b65d6)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/835571a0-3c7e-443d-80f2-2d8a61f126da)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/7dee55a9-808f-4838-a4cd-b03d2e03f9d1)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/0d8926b0-4a9f-4b5e-b62d-b86cb32acb6e)
+
 
 
 
