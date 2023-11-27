@@ -12,6 +12,7 @@ import ar.com.utn.devmobile.servimatch.ui.model.ApiService
 import ar.com.utn.devmobile.servimatch.ui.model.BodyRequestBusqueda
 import ar.com.utn.devmobile.servimatch.ui.model.FiltroAplicado
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
+import com.google.android.gms.maps.model.LatLng
 
 fun List<ProviderInfo>?.safeAccess(block: (List<ProviderInfo>) -> Unit) {
     this?.let { block(it) }
@@ -34,12 +35,12 @@ class ListaDeProveedores : ViewModel() {
     val filtrosAplicados = mutableListOf<FiltroAplicado>()
 
     //Esta funcion se ejecuta cuando renderiza el HomeActivity. Le pega a la base y hace un get a los recomendados.
-    suspend fun getProvedores(latitud:Double, longitud: Double){
+    suspend fun getProvedores(userLocation: LatLng){
         try {
-
-            val response = ApiClient.apiService.getProvidersByCoordinates(latitud,longitud)
-            val providers = response.body()
-            providers.safeAccess{ providersInfo ->
+            val response = ApiClient.apiService.getProviders()
+            val providers = response.body() ?: emptyList()
+            val providersCercanos = calcularProveedoresCercanos(providers, userLocation)
+            providersCercanos.safeAccess{ providersInfo ->
                 recomendados.value = providersInfo.filter { it -> it.isRecommended }.toMutableList()
                 general.value = providersInfo.filter { it -> !it.isRecommended }.toMutableList()
             }
@@ -51,7 +52,6 @@ class ListaDeProveedores : ViewModel() {
         }
 
     }
-
 
 
     //  Esta funcion se dispara cuando se aprieta algun filtro en el HomeActivity. En el composable Filter.
@@ -76,9 +76,9 @@ class ListaDeProveedores : ViewModel() {
         //Le pego y me traigo los proveedores. Los cargo en la lista de busqueda, cuando deje de ser vacia se renderiza.
         busqueda.value = mutableListOf<ProviderInfo>().apply {
             addAll(busqueda.value)
-            add( ProviderInfo(2,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Maria", "Esperanza",2,  listOf("Belgrano"), "plomero", true)
+            add( ProviderInfo(2,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Maria", "Esperanza",2,  listOf("Belgrano"), "plomero", true, latitud = 0.0, longitud = 0.0, rangoMax = 0.0)
             )
-            add(ProviderInfo(0,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Joaquin", "Benitez",4,  listOf("Palermo"), "plomero", false),
+            add(ProviderInfo(0,"https://statics.launion.digital/2023/07/crop/64b07fb27fe81__940x620.webp", "Joaquin", "Benitez",4,  listOf("Palermo"), "plomero", false, latitud = 0.0, longitud = 0.0, rangoMax = 0.0),
             )
 
         }

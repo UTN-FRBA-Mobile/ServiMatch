@@ -27,6 +27,15 @@ data class ProviderInfo(
     @SerializedName("recomendado")
     val isRecommended: Boolean,
 
+    @SerializedName("latitud")
+    val latitud: Double,
+
+    @SerializedName("longitud")
+    val longitud: Double,
+
+    @SerializedName("rangoMax")
+    val rangoMax: Double,
+
     @SerializedName("puntaje")
     val puntaje: Float
 )

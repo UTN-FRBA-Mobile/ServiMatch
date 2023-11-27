@@ -89,7 +89,7 @@ fun BookingScreen(navController: NavController, idProveedor: Int, precioConsulta
             var result = false
             if (turnoSelected != "") {
                 val fecha = millisToDate(dateState.selectedDateMillis)
-                val cliente = MyPreferences.getInstance().get("username")?:""
+                val cliente = MyPreferences.getInstance().get("username") as? String ?: ""
                 val request = ReservaRequest(turnoSelected, fecha, cliente, precioConsulta)
                 Log.d("reserva", "ENVIANDO AL BACK")
                 Log.d("Turno reserva", turnoSelected)

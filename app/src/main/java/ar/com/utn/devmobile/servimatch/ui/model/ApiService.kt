@@ -13,16 +13,21 @@ interface ApiService {
     @POST("/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<JSONObject>
 
-    @POST("/providers/{provider_id}/reservas")
-    suspend fun createReserva(
-        @Path("provider_id") providerId: Int,
-        @Body loginRequest: ReservaRequest
-    ): Response<JSONObject>
+    @GET("/users/{username}")
+    suspend fun getUser(
+        @Path("username") username: String
+    ): Response<UserInfo>
 
     @PATCH("/users/{username}")
     suspend fun saveUserToken(
         @Path("username") username: String,
         @Body token: TokenRequest
+    ): Response<JSONObject>
+
+    @POST("/providers/{provider_id}/reservas")
+    suspend fun createReserva(
+        @Path("provider_id") providerId: Int,
+        @Body loginRequest: ReservaRequest
     ): Response<JSONObject>
 
     @GET("/tipoProfesion")

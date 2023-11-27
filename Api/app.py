@@ -23,7 +23,7 @@ def tipoServicio():
             , 'Plomeria'
             , 'Carpinteria'
             , 'Albañil'
-            , 'Mecánico'
+            , 'Automotriz'
             , 'Jardineria'
             , 'Herrero'
             , 'Zapatero'
@@ -308,7 +308,7 @@ def provider_profile(provider_id):
 
 
 @app.route('/users/<string:username>', methods=['PATCH'])
-def refreshToken(username):
+def getUser(username):
     try:
         data = request.get_json()
         token = data["token"]
@@ -317,6 +317,16 @@ def refreshToken(username):
             if user["username"] == username:
                 user["token"] = token
                 return jsonify({'message': 'Login successful'}), 200
+        return jsonify({'message': 'Login error'}), 403
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/users/<string:username>', methods=['GET'])
+def refreshToken(username):
+    try:
+        for user in USERS:
+            if user["username"] == username:
+                return jsonify(user), 200
         return jsonify({'message': 'Login error'}), 403
     except Exception as e:
         return {'error': str(e)}, 500
@@ -337,7 +347,7 @@ def enviar_notificacion(username, provider):
     token = user["token"] if user and "token" in user else None
     provider_name = provider["nombre"]
     provider_lastname = provider["apellido"]
-    body = f"{provider_name} {provider_lastname} acepto tu reserva.\n Hace click para coordinar la visita!"
+    body = f"{provider_name} {provider_lastname} acepto tu reserva.\nHace click para coordinar la visita!"
     disponibilidad = ", ".join(provider["disponibilidad"])
     send_notification(body, provider["id"], provider["precio_visita"], disponibilidad, token)
 

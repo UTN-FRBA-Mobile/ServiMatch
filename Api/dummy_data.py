@@ -17,9 +17,9 @@ PROVIDERS = [
             "Recoleta",
             "Palermo" 
         ],
-        "latitud": -34.608550,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.586299,
+        "longitud": -58.398601,
+        "rangoMax": 1800,
         "servicios_completados": 10,
         "medios_de_contacto": {
             "telefono": "+1144562893",
@@ -73,9 +73,9 @@ PROVIDERS = [
             "San Telmo",
             "La Boca" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.629178,
+        "longitud": -58.362879,
+        "rangoMax": 1500,
         "servicios_completados": 30,
         "medios_de_contacto": {
             "telefono": "+1234567890",
@@ -126,12 +126,12 @@ PROVIDERS = [
             "Mañana"
         ],       
         "ubicaciones": [
-            "Microcentro",
-            "Belgrano" 
+            "San Nicolas",
+            "Montserrat" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.605468,
+        "longitud": -58.379357,
+        "rangoMax": 2500,
         "servicios_completados": 20,
         "medios_de_contacto": {
             "telefono": "+1225489632",
@@ -182,12 +182,12 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Villa Crespo",
-            "Villa Devoto"
+            "Flores",
+            "Parque Avellaneda"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.646025,
+        "longitud": -58.465210,
+        "rangoMax": 3100,
         "servicios_completados": 5,
         "medios_de_contacto": {
             "telefono": "+1225418596",
@@ -215,7 +215,7 @@ PROVIDERS = [
         "image_path": "https://img.freepik.com/foto-gratis/mecanico-automoviles-trabajando-garaje-servicio-reparacion_146671-19690.jpg",
         "nombre": "Marcos",
         "apellido": "Rodríguez",
-        "profesion": "Mecánico",
+        "profesion": "Automotriz",
         "puntaje":3.9,
         "cant_signos_pesos": 5,
         "precio_visita":"7000",
@@ -224,12 +224,12 @@ PROVIDERS = [
             "Ninguna"
         ],
         "ubicaciones": [
-            "Villa del Parque",
+            "Belgrano",
             "Núñez"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.548366,
+        "longitud": -58.456424,
+        "rangoMax": 1800,
         "servicios_completados": 15,
         "medios_de_contacto": {
             "telefono": "+1221365874",
@@ -267,12 +267,13 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Saavedra",
-            "Flores"
+            "Agronomia",
+            "La Paternal",
+            "Villa del Parque"
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 5000,
+        "latitud": -34.599454,
+        "longitud": -58.481152,
+        "rangoMax": 3800,
         "servicios_completados": 25,
         "medios_de_contacto": {
             "telefono": "+1225144152",
@@ -300,7 +301,7 @@ PROVIDERS = [
         "image_path": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5TcVFjPc_Z0ZdLUAA2Df6uTrJL1C5Al4-w&usqp=CAU",
         "nombre": "Melisa",
         "apellido": "Perez",
-        "profesion": "Costurera",
+        "profesion": "Costureria",
         "puntaje":4.5,
         "cant_signos_pesos": 4,
         "precio_visita":"3900",
@@ -310,12 +311,12 @@ PROVIDERS = [
             "Tarde"
         ],
         "ubicaciones": [
-            "Flores",
+            "Almagro",
             "Caballito" 
         ],
-        "latitud": -34.608728,
-        "longitud": -58.427796,
-        "rangoMax": 100,
+        "latitud": -34.614148,
+        "longitud": -58.434044,
+        "rangoMax": 2900,
         "servicios_completados": 10,
         "medios_de_contacto": {
             "telefono": "+1234567890",

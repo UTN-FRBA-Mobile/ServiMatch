@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import ar.com.utn.devmobile.servimatch.MyPreferences
 import ar.com.utn.devmobile.servimatch.ui.model.ApiClient
 import ar.com.utn.devmobile.servimatch.ui.model.ProviderInfo
 import ar.com.utn.devmobile.servimatch.ui.theme.Purpura1
@@ -61,6 +62,7 @@ import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa3
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa4
 import ar.com.utn.devmobile.servimatch.ui.theme.Turquesa5
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.model.LatLng
 import kotlin.math.roundToInt
 
 
@@ -78,8 +80,11 @@ fun HomeScreen(navController: NavController, username: String) {
 
     //Cargo las primeras listas, recomendados y general. Pegandole al back.
     LaunchedEffect(Unit) {
-        //la longitud y latitud esta hardcodeada
-        listaDeProveedores.getProvedores(-34.608550,-58.427796)
+        val userLocation = MyPreferences.getInstance().get("latlong_user") as? LatLng
+        if (userLocation != null) {
+            listaDeProveedores.getProvedores(userLocation)
+        }
+
     }
         Column(
             modifier = Modifier
