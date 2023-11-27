@@ -127,7 +127,7 @@ fun HomeScreen(navController: NavController, username: String) {
 @Composable
 fun ProvidersList(navController: NavController, listaProveedores: ListaDeProveedores) {
     val busqueda by remember { listaProveedores.busqueda }
-    if (listaProveedores.general.value.isNotEmpty() && listaProveedores.recomendados.value.isNotEmpty()){
+    if (listaProveedores.general.value.isNotEmpty() || listaProveedores.recomendados.value.isNotEmpty()){
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
