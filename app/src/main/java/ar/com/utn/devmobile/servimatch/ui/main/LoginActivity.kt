@@ -116,7 +116,7 @@ fun LoginScreen(navController: NavController) {
                                 refreshUserToken()
                                 delay(1000)
                                 navController.navigate(
-                                    route = "home/${username}"
+                                    route = "map/${username}"
                                 )
                             } else {
                                 isError = true

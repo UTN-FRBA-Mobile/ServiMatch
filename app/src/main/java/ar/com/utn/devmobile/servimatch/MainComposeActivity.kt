@@ -50,7 +50,7 @@ class MainComposeActivity : ComponentActivity() {
 @Composable
 private fun App() {
     navController = rememberNavController()
-    NavHost(navController = navController as NavHostController, startDestination = "map/admin") {
+    NavHost(navController = navController as NavHostController, startDestination = "login") {
 
         composable("login") {
             LoginScreen(navController = navController)

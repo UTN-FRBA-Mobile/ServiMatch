@@ -87,8 +87,9 @@ import com.google.maps.android.compose.rememberMarkerState
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MapScreen(navController: NavController, username: String) {
-    val username = "admin" //TODO BORRAR, ES PARA PRUEBAS
+    //val username = "admin" //TODO BORRAR, ES PARA PRUEBAS
     var user: UserInfo by remember { mutableStateOf(UserInfo("admin", "", 0.0, 0.0)) }
+    var direccion by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var colorSearchBar by remember { mutableStateOf(Color.Black) }
     var providers: List<ProviderInfo> by remember { mutableStateOf(emptyList()) }
@@ -98,6 +99,7 @@ fun MapScreen(navController: NavController, username: String) {
         val providersResponse = ApiClient.apiService.getProviders()
         userResponse.body()?.let { repsonseUser ->
             user = repsonseUser
+            direccion = user.direccion
         }
         providers = providersResponse.body() ?: emptyList()
         isLoading = false
@@ -115,25 +117,19 @@ fun MapScreen(navController: NavController, username: String) {
                 .fillMaxSize()
                 .fillMaxHeight()
         ) {
-            val userMarker = rememberMarkerState( key = "user", position = LatLng(user.latitud, user.longitud))
             TopBar(
                 navController = navController,
                 colorSearchBar = colorSearchBar,
                 onCancel = { color -> colorSearchBar = color },
-                onChange = { value -> user.direccion = value }
+                onChange = { value -> direccion = value }
             )
             MyGoogleMap(
                 navController = navController,
-                userMarker = userMarker,
                 user = user,
+                direccion = direccion,
                 providers = providers,
-                changeColor = { color -> colorSearchBar = color },
-                onChangeMarker = { position -> userMarker.position = position }
+                changeColor = { color -> colorSearchBar = color }
             )
-           /* GoHomeSection(
-                navController = navController,
-                providers, userMarker.position
-            )*/
         }
 
     }
@@ -189,7 +185,10 @@ fun TopBar(
             trailingIcon = {
                 if (isClearVisible) {
                     Row() {
-                        IconButton(onClick = { onChange(searchText) }) {
+                        IconButton(onClick = { 
+                            onChange(searchText) 
+                            Log.d("MAPS", "VALOR: $searchText")
+                        }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search"
@@ -216,26 +215,26 @@ fun TopBar(
 @Composable
 fun MyGoogleMap(
     navController: NavController,
-    userMarker: MarkerState,
     user: UserInfo,
+    direccion: String,
     providers: List<ProviderInfo>,
     changeColor: (Color) -> Unit,
-    onChangeMarker: (LatLng) -> Unit
 ) {
     val userLatLong = LatLng(user.latitud, user.longitud)
-    Log.d("MAPS", "Direccion en MyGoogleMaps: ${user.direccion}")
+    Log.d("MAPS", "Direccion en MyGoogleMaps: $direccion")
     var isLoading by remember { mutableStateOf(true) }
     var selectedProvider by remember { mutableStateOf<ProviderInfo?>(null) }
+    val userMarker = rememberMarkerState( key = "user", position = LatLng(user.latitud, user.longitud))
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
 
-    LaunchedEffect(user.direccion) {
+    LaunchedEffect(direccion) {
         isLoading = true
         getLatLong(
             geocoder = geocoder,
-            direccion = user.direccion,
-            markerChange = onChangeMarker,
+            direccion = direccion,
+            markerChange = { newMarker -> userMarker.position = newMarker },
             onReady = { isLoading = false },
             changeColor = changeColor
         )
@@ -271,9 +270,9 @@ fun MyGoogleMap(
                         onClose = { selectedProvider = null }
                     )
                 }
-                MarcarRangosProviders(providers = providers, onProviderClick = { provider ->
-                    selectedProvider = provider
-                })
+                //MarcarRangosProviders(providers = providers, onProviderClick = { provider ->
+                //    selectedProvider = provider
+                //})
             }
             GoHomeSection(navController, providers, userMarker.position, user.username)
         }
@@ -324,7 +323,6 @@ fun GoHomeSection(
                 navController.navigate("home/$username")
             },
             shape = RoundedCornerShape(10.dp),
-            enabled = hayProveedores
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
