@@ -30,7 +30,7 @@ Descarga ServiMatch hoy y descubrí una manera más inteligente y eficiente de c
 
 ![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/987e6f98-4786-49a8-bb4a-88211fb1f441)
 ![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/f103cb7a-1562-400d-bd0c-82b6f63b65d6)
-![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/835571a0-3c7e-443d-80f2-2d8a61f126da)
+![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/3567ef85-35ea-4790-bd83-48827679da3e)
 ![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/7dee55a9-808f-4838-a4cd-b03d2e03f9d1)
 ![image](https://github.com/UTN-FRBA-Mobile/ServiMatch/assets/146040601/0d8926b0-4a9f-4b5e-b62d-b86cb32acb6e)
 
