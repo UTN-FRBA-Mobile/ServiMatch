@@ -25,8 +25,8 @@ class MyPreferences {
         Log.d("PREFERENCES", "GET -> KEY: $key")
         return preferencesMap[key]
     }
-
-    /*var token: String? = null
+/*
+    var token: String? = null
     var username: String? = null
     var userLatLong: LatLng? = null
 

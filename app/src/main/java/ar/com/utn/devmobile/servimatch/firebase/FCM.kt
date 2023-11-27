@@ -21,12 +21,8 @@ class FCM : FirebaseMessagingService() {
     fun saveTokenInPreferences() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val token = task.result
-                if (token != null) {
+                val token = task.result!!
                     MyPreferences.getInstance().set("token", token)
-                } else {
-                    Log.w("FCM", "El token es nulo")
-                }
             } else {
                 Log.w("FCM", "Error al obtener el token", task.exception)
             }
